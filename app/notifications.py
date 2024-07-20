@@ -14,7 +14,7 @@ def notify(title, message):
 
 def send_email(subject, body, to_email):
     from_email = "pagestowages@gmail.com"
-    from_password = "Mayy5790098192011"
+    from_password = "nsxm wnrm nvcq gamm"
 
     msg = MIMEMultipart()
     msg['From'] = from_email
