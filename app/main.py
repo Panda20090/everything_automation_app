@@ -28,7 +28,6 @@ from visualization_enhancements import enhanced_visualization
 from data_sync import upload_to_dropbox, download_from_dropbox
 from auth import create_user_table, register_user, verify_user
 import sqlite3
-from auth import create_user_table, register_user, verify_user
 from email_reporting import send_report
 from cloud_backup import backup_to_gdrive, download_from_gdrive
 from web_scraping import scrape_website
@@ -37,201 +36,16 @@ from sentiment_analysis import analyze_file_sentiment
 from model_training import train_model
 from data_preprocessing import preprocess_data
 
-
-
-
-
 class DataAutomationApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Data Automation Application")
         create_user_table()
         setup_logging()
-        self.create_widgets()
+        self.create_login_register_frames()
         log_info("Application started")
 
-    def create_widgets(self):
-        # Create buttons for each automation task
-        self.create_button = tk.Button(self.root, text="Define Goals and Objectives", command=self.define_goals)
-        self.create_button.grid(row=0, column=0, padx=10, pady=10)
-
-        self.market_button = tk.Button(self.root, text="Conduct Market Research", command=self.market_research)
-        self.market_button.grid(row=1, column=0, padx=10, pady=10)
-
-        self.resource_button = tk.Button(self.root, text="Evaluate Available Resources", command=self.evaluate_resources)
-        self.resource_button.grid(row=2, column=0, padx=10, pady=10)
-
-        self.content_button = tk.Button(self.root, text="Plan Content Strategy", command=self.create_content_calendar)
-        self.content_button.grid(row=3, column=0, padx=10, pady=10)
-
-        self.google_trends_button = tk.Button(self.root, text="Generate Google Trends Report", command=self.create_google_trends_report)
-        self.google_trends_button.grid(row=4, column=0, padx=10, pady=10)
-
-        self.twitter_button = tk.Button(self.root, text="Generate Twitter Report", command=self.create_twitter_report)
-        self.twitter_button.grid(row=5, column=0, padx=10, pady=10)
-
-        self.retrieve_google_trends_button = tk.Button(self.root, text="Retrieve Google Trends Data", command=self.retrieve_google_trends)
-        self.retrieve_google_trends_button.grid(row=6, column=0, padx=10, pady=10)
-
-        self.retrieve_twitter_button = tk.Button(self.root, text="Retrieve Twitter Data", command=self.retrieve_twitter)
-        self.retrieve_twitter_button.grid(row=7, column=0, padx=10, pady=10)
-
-        self.process_google_trends_button = tk.Button(self.root, text="Process Google Trends Data", command=self.process_google_trends)
-        self.process_google_trends_button.grid(row=8, column=0, padx=10, pady=10)
-
-        self.process_twitter_button = tk.Button(self.root, text="Process Twitter Data", command=self.process_twitter)
-        self.process_twitter_button.grid(row=9, column=0, padx=10, pady=10)
-
-        self.visualize_google_trends_button = tk.Button(self.root, text="Visualize Google Trends Data", command=self.visualize_google_trends)
-        self.visualize_google_trends_button.grid(row=10, column=0, padx=10, pady=10)
-
-        self.visualize_twitter_button = tk.Button(self.root, text="Visualize Twitter Data", command=self.visualize_twitter)
-        self.visualize_twitter_button.grid(row=11, column=0, padx=10, pady=10)
-
-        self.generate_google_trends_report_button = tk.Button(self.root, text="Generate Google Trends Report", command=self.generate_google_trends_report)
-        self.generate_google_trends_report_button.grid(row=12, column=0, padx=10, pady=10)
-
-        self.generate_twitter_report_button = tk.Button(self.root, text="Generate Twitter Report", command=self.generate_twitter_report)
-        self.generate_twitter_report_button.grid(row=13, column=0, padx=10, pady=10)
-
-        self.publish_medium_button = tk.Button(self.root, text="Publish to Medium", command=self.publish_medium)
-        self.publish_medium_button.grid(row=14, column=0, padx=10, pady=10)
-
-        self.publish_wordpress_button = tk.Button(self.root, text="Publish to WordPress", command=self.publish_wordpress)
-        self.publish_wordpress_button.grid(row=15, column=0, padx=10, pady=10)
-
-        self.publish_twitter_button = tk.Button(self.root, text="Publish to Twitter", command=self.publish_twitter)
-        self.publish_twitter_button.grid(row=16, column=0, padx=10, pady=10)
-
-        self.track_metrics_button = tk.Button(self.root, text="Track Performance Metrics", command=self.track_metrics)
-        self.track_metrics_button.grid(row=17, column=0, padx=10, pady=10)
-    
-        self.analyze_feedback_button = tk.Button(self.root, text="Analyze Feedback", command=self.analyze_feedback)
-        self.analyze_feedback_button.grid(row=18, column=0, padx=10, pady=10)
-
-        self.clean_google_trends_button = tk.Button(self.root, text="Clean Google Trends Data", command=self.clean_google_trends)
-        self.clean_google_trends_button.grid(row=19, column=0, padx=10, pady=10)
-
-        self.clean_twitter_button = tk.Button(self.root, text="Clean Twitter Data", command=self.clean_twitter)
-        self.clean_twitter_button.grid(row=20, column=0, padx=10, pady=10)
-
-        self.store_google_trends_button = tk.Button(self.root, text="Store Google Trends Data", command=self.store_google_trends_data)
-        self.store_google_trends_button.grid(row=21, column=0, padx=10, pady=10)
-
-        self.store_twitter_button = tk.Button(self.root, text="Store Twitter Data", command=self.store_twitter_data)
-        self.store_twitter_button.grid(row=22, column=0, padx=10, pady=10)
-
-        self.query_google_trends_button = tk.Button(self.root, text="Query Google Trends Data", command=self.query_google_trends_data)
-        self.query_google_trends_button.grid(row=23, column=0, padx=10, pady=10)
-
-        self.query_twitter_button = tk.Button(self.root, text="Query Twitter Data", command=self.query_twitter_data)
-        self.query_twitter_button.grid(row=24, column=0, padx=10, pady=10)
-
-        self.send_email_button = tk.Button(self.root, text="Send Email Notification", command=self.send_email)
-        self.send_email_button.grid(row=25, column=0, padx=10, pady=10)
-
-        self.generate_report_button = tk.Button(self.root, text="Generate Report", command=self.generate_report)
-        self.generate_report_button.grid(row=26, column=0, padx=10, pady=10)
-
-        self.start_scheduler_button = tk.Button(self.root, text="Start Scheduler", command=self.start_scheduler)
-        self.start_scheduler_button.grid(row=27, column=0, padx=10, pady=10)
-
-        self.backup_database_button = tk.Button(self.root, text="Backup Database", command=self.backup_database)
-        self.backup_database_button.grid(row=28, column=0, padx=10, pady=10)
-
-        self.restore_database_button = tk.Button(self.root, text="Restore Database", command=self.restore_database)
-        self.restore_database_button.grid(row=29, column=0, padx=10, pady=10)
-
-        self.launch_dashboard_button = tk.Button(self.root, text="Launch Dashboard", command=self.launch_dashboard)
-        self.launch_dashboard_button.grid(row=30, column=0, padx=10, pady=10)
-
-        self.analyze_google_trends_button = tk.Button(self.root, text="Analyze Google Trends Data", command=self.analyze_google_trends)
-        self.analyze_google_trends_button.grid(row=31, column=0, padx=10, pady=10)
-
-        self.analyze_twitter_button = tk.Button(self.root, text="Analyze Twitter Data", command=self.analyze_twitter)
-        self.analyze_twitter_button.grid(row=32, column=0, padx=10, pady=10)
-
-        self.export_google_trends_csv_button = tk.Button(self.root, text="Export Google Trends to CSV", command=self.export_google_trends_csv)
-        self.export_google_trends_csv_button.grid(row=33, column=0, padx=10, pady=10)
-
-        self.export_google_trends_excel_button = tk.Button(self.root, text="Export Google Trends to Excel", command=self.export_google_trends_excel)
-        self.export_google_trends_excel_button.grid(row=34, column=0, padx=10, pady=10)
-
-        self.export_google_trends_json_button = tk.Button(self.root, text="Export Google Trends to JSON", command=self.export_google_trends_json)
-        self.export_google_trends_json_button.grid(row=35, column=0, padx=10, pady=10)
-
-        self.generate_key_button = tk.Button(self.root, text="Generate Encryption Key", command=self.generate_key)
-        self.generate_key_button.grid(row=36, column=0, padx=10, pady=10)
-
-        self.encrypt_file_button = tk.Button(self.root, text="Encrypt Data File", command=self.encrypt_file)
-        self.encrypt_file_button.grid(row=37, column=0, padx=10, pady=10)
-
-        self.decrypt_file_button = tk.Button(self.root, text="Decrypt Data File", command=self.decrypt_file)
-        self.decrypt_file_button.grid(row=38, column=0, padx=10, pady=10)
-
-        self.generate_api_key_button = tk.Button(self.root, text="Generate API Key Encryption Key", command=self.generate_api_key_key)
-        self.generate_api_key_button.grid(row=39, column=0, padx=10, pady=10)
-
-        self.encrypt_api_key_button = tk.Button(self.root, text="Encrypt API Key", command=self.encrypt_api_key)
-        self.encrypt_api_key_button.grid(row=40, column=0, padx=10, pady=10)
-
-        self.decrypt_api_key_button = tk.Button(self.root, text="Decrypt API Key", command=self.decrypt_api_key)
-        self.decrypt_api_key_button.grid(row=41, column=0, padx=10, pady=10)
-
-        self.enhanced_google_trends_button = tk.Button(self.root, text="Enhanced Google Trends Visualization", command=self.enhanced_google_trends)
-        self.enhanced_google_trends_button.grid(row=42, column=0, padx=10, pady=10)
-
-        self.enhanced_twitter_button = tk.Button(self.root, text="Enhanced Twitter Visualization", command=self.enhanced_twitter)
-        self.enhanced_twitter_button.grid(row=43, column=0, padx=10, pady=10)
-
-        self.upload_dropbox_button = tk.Button(self.root, text="Upload to Dropbox", command=self.upload_to_dropbox)
-        self.upload_dropbox_button.grid(row=44, column=0, padx=10, pady=10)
-
-        self.download_dropbox_button = tk.Button(self.root, text="Download from Dropbox", command=self.download_from_dropbox)
-        self.download_dropbox_button.grid(row=45, column=0, padx=10, pady=10)
-
-        self.send_email_report_button = tk.Button(self.root, text="Send Email Report", command=self.send_email_report)
-        self.send_email_report_button.grid(row=46, column=0, padx=10, pady=10)
-
-        self.backup_gdrive_button = tk.Button(self.root, text="Backup to Google Drive", command=self.backup_to_gdrive)
-        self.backup_gdrive_button.grid(row=47, column=0, padx=10, pady=10)
-
-        self.download_gdrive_button = tk.Button(self.root, text="Download from Google Drive", command=self.download_from_gdrive)
-        self.download_gdrive_button.grid(row=48, column=0, padx=10, pady=10)
-
-        self.scrape_website_button = tk.Button(self.root, text="Scrape Website", command=self.scrape_website)
-        self.scrape_website_button.grid(row=49, column=0, padx=10, pady=10)
-
-        self.heatmap_button = tk.Button(self.root, text="Generate Heatmap", command=self.generate_heatmap)
-        self.heatmap_button.grid(row=50, column=0, padx=10, pady=10)
-
-        self.histogram_button = tk.Button(self.root, text="Generate Histogram", command=self.generate_histogram)
-        self.histogram_button.grid(row=51, column=0, padx=10, pady=10)
-
-        self.pie_chart_button = tk.Button(self.root, text="Generate Pie Chart", command=self.generate_pie_chart)
-        self.pie_chart_button.grid(row=52, column=0, padx=10, pady=10)
-
-        self.sentiment_analysis_button = tk.Button(self.root, text="Analyze Sentiment", command=self.analyze_sentiment)
-        self.sentiment_analysis_button.grid(row=53, column=0, padx=10, pady=10)
-
-        self.train_model_button = tk.Button(self.root, text="Train Model", command=self.train_model)
-        self.train_model_button.grid(row=54, column=0, padx=10, pady=10)
-
-        self.preprocess_data_button = tk.Button(self.root, text="Preprocess Data", command=self.preprocess_data)
-        self.preprocess_data_button.grid(row=55, column=0, padx=10, pady=10)
-
-
-
-
-
-
-
-
-
-
-
-
-        #login and registration frame
+    def create_login_register_frames(self):
         self.login_frame = tk.Frame(self.root)
         self.login_frame.grid(row=0, column=0, padx=10, pady=10)
 
@@ -256,23 +70,107 @@ class DataAutomationApp:
         self.register_button = tk.Button(self.register_frame, text="Register", command=self.register)
         self.register_button.grid(row=2, column=0, columnspan=2)
 
+        self.main_frame = None
 
+    def show_main_interface(self):
+        if self.main_frame is not None:
+            self.main_frame.destroy()
+        
+        self.main_frame = tk.Frame(self.root)
+        self.main_frame.grid(row=0, column=0, padx=10, pady=10)
+        self.create_main_interface()
 
+    def create_main_interface(self):
+        # Create buttons for each automation task in the main frame
+        self.main_buttons = [
+            ("Define Goals and Objectives", self.define_goals),
+            ("Conduct Market Research", self.market_research),
+            ("Evaluate Available Resources", self.evaluate_resources),
+            ("Plan Content Strategy", self.create_content_calendar),
+            ("Generate Google Trends Report", self.create_google_trends_report),
+            ("Generate Twitter Report", self.create_twitter_report),
+            ("Retrieve Google Trends Data", self.retrieve_google_trends),
+            ("Retrieve Twitter Data", self.retrieve_twitter),
+            ("Process Google Trends Data", self.process_google_trends),
+            ("Process Twitter Data", self.process_twitter),
+            ("Visualize Google Trends Data", self.visualize_google_trends),
+            ("Visualize Twitter Data", self.visualize_twitter),
+            ("Publish to Medium", self.publish_medium),
+            ("Publish to WordPress", self.publish_wordpress),
+            ("Publish to Twitter", self.publish_twitter),
+            ("Track Performance Metrics", self.track_metrics),
+            ("Analyze Feedback", self.analyze_feedback),
+            ("Clean Google Trends Data", self.clean_google_trends),
+            ("Clean Twitter Data", self.clean_twitter),
+            ("Store Google Trends Data", self.store_google_trends_data),
+            ("Store Twitter Data", self.store_twitter_data),
+            ("Query Google Trends Data", self.query_google_trends_data),
+            ("Query Twitter Data", self.query_twitter_data),
+            ("Send Email Notification", self.send_email),
+            ("Generate Report", self.generate_report),
+            ("Start Scheduler", self.start_scheduler),
+            ("Backup Database", self.backup_database),
+            ("Restore Database", self.restore_database),
+            ("Launch Dashboard", self.launch_dashboard),
+            ("Analyze Google Trends Data", self.analyze_google_trends),
+            ("Analyze Twitter Data", self.analyze_twitter),
+            ("Export Google Trends to CSV", self.export_google_trends_csv),
+            ("Export Google Trends to Excel", self.export_google_trends_excel),
+            ("Export Google Trends to JSON", self.export_google_trends_json),
+            ("Generate Encryption Key", self.generate_key),
+            ("Encrypt Data File", self.encrypt_file),
+            ("Decrypt Data File", self.decrypt_file),
+            ("Generate API Key Encryption Key", self.generate_api_key_key),
+            ("Encrypt API Key", self.encrypt_api_key),
+            ("Decrypt API Key", self.decrypt_api_key),
+            ("Enhanced Google Trends Visualization", self.enhanced_google_trends),
+            ("Enhanced Twitter Visualization", self.enhanced_twitter),
+            ("Upload to Dropbox", self.upload_to_dropbox),
+            ("Download from Dropbox", self.download_from_dropbox),
+            ("Send Email Report", self.send_email_report),
+            ("Backup to Google Drive", self.backup_to_gdrive),
+            ("Download from Google Drive", self.download_from_gdrive),
+            ("Scrape Website", self.scrape_website),
+            ("Generate Heatmap", self.generate_heatmap),
+            ("Generate Histogram", self.generate_histogram),
+            ("Generate Pie Chart", self.generate_pie_chart),
+            ("Analyze Sentiment", self.analyze_sentiment),
+            ("Train Model", self.train_model),
+            ("Preprocess Data", self.preprocess_data),
+        ]
 
-
-
-
-
-
-
+        for i, (text, command) in enumerate(self.main_buttons):
+            tk.Button(self.main_frame, text=text, command=command).grid(row=i, column=0, padx=10, pady=5, sticky='ew')
 
         # Create frame for graphs/charts
-        self.chart_frame = ttk.LabelFrame(self.root, text="Graphs/Charts")
-        self.chart_frame.grid(row=0, column=1, rowspan=4, padx=10, pady=10)
+        self.chart_frame = ttk.LabelFrame(self.main_frame, text="Graphs/Charts")
+        self.chart_frame.grid(row=0, column=1, rowspan=15, padx=10, pady=10)
 
         # Create output text window
-        self.output_text = scrolledtext.ScrolledText(self.root, width=50, height=20)
-        self.output_text.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
+        self.output_text = scrolledtext.ScrolledText(self.main_frame, width=50, height=20)
+        self.output_text.grid(row=15, column=0, columnspan=2, padx=10, pady=10)
+
+    def login(self):
+        username = self.login_username.get()
+        password = self.login_password.get()
+        if verify_user(username, password):
+            self.login_frame.grid_forget()
+            self.register_frame.grid_forget()
+            self.show_main_interface()
+            self.output_text.insert(tk.END, "Login successful.\n")
+        else:
+            self.output_text.insert(tk.END, "Login failed.\n")
+
+    def register(self):
+        username = self.register_username.get()
+        password = self.register_password.get()
+        try:
+            register_user(username, password)
+            self.output_text.insert(tk.END, "Registration successful.\n")
+        except sqlite3.IntegrityError:
+            self.output_text.insert(tk.END, "Registration failed: Username already exists.\n")
+
+    # Define the functions for each button below...
 
     def define_goals(self):
         try:
@@ -307,7 +205,6 @@ class DataAutomationApp:
         except Exception as e:
             self.output_text.insert(tk.END, f"Error conducting market research: {e}\n")
             log_error(f"Error conducting market research: {e}")
-
 
     def evaluate_resources(self):
         resources = {
@@ -453,7 +350,6 @@ class DataAutomationApp:
         self.output_text.insert(tk.END, "Twitter data cleaned and stored in data/cleaned_twitter_data.csv.\n")
         self.show_chart(df)
 
-
     def store_google_trends_data(self):
         conn = setup_database()
         df = pd.read_csv('data/cleaned_google_trends_data.csv')
@@ -479,16 +375,17 @@ class DataAutomationApp:
     def query_google_trends_data(self):
         conn = setup_database()
         query = "SELECT * FROM google_trends"
-        rows = query_data(conn, query)
+        rows = query_data(conn, query)  # Ensure rows is defined here
         for row in rows:
             self.output_text.insert(tk.END, f"{row}\n")
 
     def query_twitter_data(self):
         conn = setup_database()
         query = "SELECT * FROM twitter"
-        rows = query_data(conn, query)
+        rows = query_data(conn, query)  # Ensure rows is defined here
         for row in rows:
             self.output_text.insert(tk.END, f"{row}\n")
+
 
     def send_email(self):
         subject = "Automated Data Report"
@@ -597,23 +494,6 @@ class DataAutomationApp:
         access_token = 'your_dropbox_access_token'  # Replace with your actual access token
         message = download_from_dropbox(dropbox_path, local_file, access_token)
         self.output_text.insert(tk.END, f"{message}\n")
-
-    def login(self):
-        username = self.login_username.get()
-        password = self.login_password.get()
-        if verify_user(username, password):
-            self.output_text.insert(tk.END, "Login successful.\n")
-        else:
-            self.output_text.insert(tk.END, "Login failed.\n")
-
-    def register(self):
-        username = self.register_username.get()
-        password = self.register_password.get()
-        try:
-            register_user(username, password)
-            self.output_text.insert(tk.END, "Registration successful.\n")
-        except sqlite3.IntegrityError:
-            self.output_text.insert(tk.END, "Registration failed: Username already exists.\n")
 
     def send_email_report(self):
         send_report()

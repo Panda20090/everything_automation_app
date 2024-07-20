@@ -1,0 +1,10 @@
+{
+    "google_trends_api_key": "your_google_trends_api_key",
+    "twitter_api_key": "your_twitter_api_key",
+    "twitter_api_secret_key": "your_twitter_api_secret_key",
+    "twitter_access_token": "your_twitter_access_token",
+    "twitter_access_token_secret": "your_twitter_access_token_secret",
+    "email": "pagestowages@gmail.com",
+    "email_password": "your_email_password"
+  }
+  
