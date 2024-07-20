@@ -7,6 +7,16 @@ import json
 from jinja2 import Environment, FileSystemLoader
 import datetime
 from data_retrieval import retrieve_google_trends_data, retrieve_twitter_data
+from data_processing import process_google_trends_data, process_twitter_data
+from data_visualization import visualize_data
+from content_generation import generate_google_trends_report, generate_twitter_report
+from content_publishing import publish_to_medium, publish_to_wordpress, publish_to_twitter
+from monitoring import track_metrics, analyze_feedback
+from data_cleanup import clean_google_trends_data, clean_twitter_data
+
+
+
+
 
 class DataAutomationApp:
     def __init__(self, root):
@@ -39,6 +49,49 @@ class DataAutomationApp:
 
         self.retrieve_twitter_button = tk.Button(self.root, text="Retrieve Twitter Data", command=self.retrieve_twitter)
         self.retrieve_twitter_button.grid(row=7, column=0, padx=10, pady=10)
+
+        self.process_google_trends_button = tk.Button(self.root, text="Process Google Trends Data", command=self.process_google_trends)
+        self.process_google_trends_button.grid(row=8, column=0, padx=10, pady=10)
+
+        self.process_twitter_button = tk.Button(self.root, text="Process Twitter Data", command=self.process_twitter)
+        self.process_twitter_button.grid(row=9, column=0, padx=10, pady=10)
+
+        self.visualize_google_trends_button = tk.Button(self.root, text="Visualize Google Trends Data", command=self.visualize_google_trends)
+        self.visualize_google_trends_button.grid(row=10, column=0, padx=10, pady=10)
+
+        self.visualize_twitter_button = tk.Button(self.root, text="Visualize Twitter Data", command=self.visualize_twitter)
+        self.visualize_twitter_button.grid(row=11, column=0, padx=10, pady=10)
+
+        self.generate_google_trends_report_button = tk.Button(self.root, text="Generate Google Trends Report", command=self.generate_google_trends_report)
+        self.generate_google_trends_report_button.grid(row=12, column=0, padx=10, pady=10)
+
+        self.generate_twitter_report_button = tk.Button(self.root, text="Generate Twitter Report", command=self.generate_twitter_report)
+        self.generate_twitter_report_button.grid(row=13, column=0, padx=10, pady=10)
+
+        self.publish_medium_button = tk.Button(self.root, text="Publish to Medium", command=self.publish_medium)
+        self.publish_medium_button.grid(row=14, column=0, padx=10, pady=10)
+
+        self.publish_wordpress_button = tk.Button(self.root, text="Publish to WordPress", command=self.publish_wordpress)
+        self.publish_wordpress_button.grid(row=15, column=0, padx=10, pady=10)
+
+        self.publish_twitter_button = tk.Button(self.root, text="Publish to Twitter", command=self.publish_twitter)
+        self.publish_twitter_button.grid(row=16, column=0, padx=10, pady=10)
+
+        self.track_metrics_button = tk.Button(self.root, text="Track Performance Metrics", command=self.track_metrics)
+        self.track_metrics_button.grid(row=17, column=0, padx=10, pady=10)
+    
+        self.analyze_feedback_button = tk.Button(self.root, text="Analyze Feedback", command=self.analyze_feedback)
+        self.analyze_feedback_button.grid(row=18, column=0, padx=10, pady=10)
+
+        self.clean_google_trends_button = tk.Button(self.root, text="Clean Google Trends Data", command=self.clean_google_trends)
+        self.clean_google_trends_button.grid(row=19, column=0, padx=10, pady=10)
+
+        self.clean_twitter_button = tk.Button(self.root, text="Clean Twitter Data", command=self.clean_twitter)
+        self.clean_twitter_button.grid(row=20, column=0, padx=10, pady=10)
+
+
+
+
 
 
 
@@ -132,6 +185,91 @@ class DataAutomationApp:
         query = 'AI content creation'
         data = retrieve_twitter_data(api_key, query)
         self.output_text.insert(tk.END, "Twitter data retrieved and stored in data/twitter_data.json.\n")
+    
+    def process_google_trends(self):
+        df = process_google_trends_data('data/google_trends_data.json')
+        self.output_text.insert(tk.END, "Google Trends data processed and stored in data/processed_google_trends_data.csv.\n")
+        self.show_chart(df)
+
+    def process_twitter(self):
+        df = process_twitter_data('data/twitter_data.json')
+        self.output_text.insert(tk.END, "Twitter data processed and stored in data/processed_twitter_data.csv.\n")
+        self.show_chart(df)
+
+    def visualize_google_trends(self):
+        output_file = visualize_data('data/processed_google_trends_data.csv', 'Google Trends Data', 'assets/charts/google_trends_visualization.png')
+        self.output_text.insert(tk.END, f"Google Trends data visualized and saved to {output_file}.\n")
+        self.show_image(output_file)
+
+    def visualize_twitter(self):
+        output_file = visualize_data('data/processed_twitter_data.csv', 'Twitter Data', 'assets/charts/twitter_visualization.png')
+        self.output_text.insert(tk.END, f"Twitter data visualized and saved to {output_file}.\n")
+        self.show_image(output_file)
+
+    def show_image(self, image_path):
+        img = tk.PhotoImage(file=image_path)
+        img_label = tk.Label(self.chart_frame, image=img)
+        img_label.image = img
+        img_label.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+
+    def generate_google_trends_report(self):
+        output_file = generate_google_trends_report()
+        self.output_text.insert(tk.END, f"Google Trends report generated and stored in {output_file}.\n")
+
+    def generate_twitter_report(self):
+        output_file = generate_twitter_report()
+        self.output_text.insert(tk.END, f"Twitter report generated and stored in {output_file}.\n")
+
+    def publish_medium(self):
+        title = "Your Report Title"
+        with open('data/google_trends_report.html', 'r') as file:
+            content = file.read()
+        access_token = 'your_medium_access_token'
+        response = publish_to_medium(title, content, access_token)
+        self.output_text.insert(tk.END, f"Published to Medium: {response}\n")
+
+    def publish_wordpress(self):
+        title = "Your Report Title"
+        with open('data/google_trends_report.html', 'r') as file:
+            content = file.read()
+        url = 'https://yourblog.wordpress.com/xmlrpc.php'
+        username = 'your_username'
+        password = 'your_password'
+        post_id = publish_to_wordpress(title, content, url, username, password)
+        self.output_text.insert(tk.END, f"Published to WordPress with post ID: {post_id}\n")
+
+    def publish_twitter(self):
+        with open('data/twitter_report.html', 'r') as file:
+            content = file.read()
+        api_key = 'your_api_key'
+        api_secret_key = 'your_api_secret_key'
+        access_token = 'your_access_token'
+        access_token_secret = 'your_access_token_secret'
+        status_id = publish_to_twitter(content, api_key, api_secret_key, access_token, access_token_secret)
+        self.output_text.insert(tk.END, f"Published to Twitter with status ID: {status_id}\n")
+
+
+
+    def track_metrics(self):
+        metrics = track_metrics()
+        self.output_text.insert(tk.END, f"Performance metrics tracked and stored in data/performance_metrics.json.\n")
+
+    def analyze_feedback(self):
+        feedback_file = 'data/feedback.json'
+        analysis = analyze_feedback(feedback_file)
+        self.output_text.insert(tk.END, f"Feedback analyzed and stored in data/feedback_analysis.json.\n")
+
+    def clean_google_trends(self):
+        df = clean_google_trends_data('data/processed_google_trends_data.csv')
+        self.output_text.insert(tk.END, "Google Trends data cleaned and stored in data/cleaned_google_trends_data.csv.\n")
+        self.show_chart(df)
+
+    def clean_twitter(self):
+        df = clean_twitter_data('data/processed_twitter_data.csv')
+        self.output_text.insert(tk.END, "Twitter data cleaned and stored in data/cleaned_twitter_data.csv.\n")
+        self.show_chart(df)
+
+
 
 
 if __name__ == "__main__":
