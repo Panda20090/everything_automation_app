@@ -4,6 +4,9 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import pandas as pd
 import json
+from jinja2 import Environment, FileSystemLoader
+import datetime
+from data_retrieval import retrieve_google_trends_data, retrieve_twitter_data
 
 class DataAutomationApp:
     def __init__(self, root):
@@ -24,6 +27,20 @@ class DataAutomationApp:
 
         self.content_button = tk.Button(self.root, text="Plan Content Strategy", command=self.create_content_calendar)
         self.content_button.grid(row=3, column=0, padx=10, pady=10)
+
+        self.google_trends_button = tk.Button(self.root, text="Generate Google Trends Report", command=self.create_google_trends_report)
+        self.google_trends_button.grid(row=4, column=0, padx=10, pady=10)
+
+        self.twitter_button = tk.Button(self.root, text="Generate Twitter Report", command=self.create_twitter_report)
+        self.twitter_button.grid(row=5, column=0, padx=10, pady=10)
+
+        self.retrieve_google_trends_button = tk.Button(self.root, text="Retrieve Google Trends Data", command=self.retrieve_google_trends)
+        self.retrieve_google_trends_button.grid(row=6, column=0, padx=10, pady=10)
+
+        self.retrieve_twitter_button = tk.Button(self.root, text="Retrieve Twitter Data", command=self.retrieve_twitter)
+        self.retrieve_twitter_button.grid(row=7, column=0, padx=10, pady=10)
+
+
 
         # Create frame for graphs/charts
         self.chart_frame = ttk.LabelFrame(self.root, text="Graphs/Charts")
@@ -84,6 +101,38 @@ class DataAutomationApp:
         canvas = FigureCanvasTkAgg(fig, master=self.chart_frame)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+    
+    def generate_content(self, template_file, output_file, context):
+        env = Environment(loader=FileSystemLoader('templates'))
+        template = env.get_template(template_file)
+        content = template.render(context)
+        with open(output_file, 'w') as f:
+            f.write(content)
+
+    def create_google_trends_report(self):
+        date = datetime.datetime.now().strftime('%Y-%m-%d')
+        context = {'date': date}
+        self.generate_content('google_trends_template.html', 'data/google_trends_report.html', context)
+        self.output_text.insert(tk.END, "Google Trends report generated and stored in data/google_trends_report.html.\n")
+
+    def create_twitter_report(self):
+        date = datetime.datetime.now().strftime('%Y-%m-%d')
+        context = {'date': date}
+        self.generate_content('twitter_template.html', 'data/twitter_report.html', context)
+        self.output_text.insert(tk.END, "Twitter report generated and stored in data/twitter_report.html.\n")
+
+    def retrieve_google_trends(self):
+        api_key = 'your_google_trends_api_key'
+        keyword = 'AI content creation'
+        data = retrieve_google_trends_data(api_key, keyword)
+        self.output_text.insert(tk.END, "Google Trends data retrieved and stored in data/google_trends_data.json.\n")
+
+    def retrieve_twitter(self):
+        api_key = 'your_twitter_api_key'
+        query = 'AI content creation'
+        data = retrieve_twitter_data(api_key, query)
+        self.output_text.insert(tk.END, "Twitter data retrieved and stored in data/twitter_data.json.\n")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
