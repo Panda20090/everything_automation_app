@@ -7,3 +7,5 @@ python-wordpress-xmlrpc
 schedule
 dash
 plotly
+openpyxl
+cryptography

@@ -20,6 +20,9 @@ import threading
 from backup_restore import backup_database, restore_database
 from dashboard import create_dashboard
 from data_analysis import analyze_google_trends_data, analyze_twitter_data
+from data_export import export_to_csv, export_to_excel, export_to_json
+from data_security import generate_key, encrypt_file, decrypt_file
+from log_management import setup_logging, log_info, log_error
 
 
 
@@ -29,7 +32,9 @@ class DataAutomationApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Data Automation Application")
+        setup_logging()
         self.create_widgets()
+        log_info("Application started")
 
     def create_widgets(self):
         # Create buttons for each automation task
@@ -132,7 +137,23 @@ class DataAutomationApp:
         self.analyze_twitter_button = tk.Button(self.root, text="Analyze Twitter Data", command=self.analyze_twitter)
         self.analyze_twitter_button.grid(row=32, column=0, padx=10, pady=10)
 
+        self.export_google_trends_csv_button = tk.Button(self.root, text="Export Google Trends to CSV", command=self.export_google_trends_csv)
+        self.export_google_trends_csv_button.grid(row=33, column=0, padx=10, pady=10)
 
+        self.export_google_trends_excel_button = tk.Button(self.root, text="Export Google Trends to Excel", command=self.export_google_trends_excel)
+        self.export_google_trends_excel_button.grid(row=34, column=0, padx=10, pady=10)
+
+        self.export_google_trends_json_button = tk.Button(self.root, text="Export Google Trends to JSON", command=self.export_google_trends_json)
+        self.export_google_trends_json_button.grid(row=35, column=0, padx=10, pady=10)
+
+        self.generate_key_button = tk.Button(self.root, text="Generate Encryption Key", command=self.generate_key)
+        self.generate_key_button.grid(row=36, column=0, padx=10, pady=10)
+
+        self.encrypt_file_button = tk.Button(self.root, text="Encrypt Data File", command=self.encrypt_file)
+        self.encrypt_file_button.grid(row=37, column=0, padx=10, pady=10)
+
+        self.decrypt_file_button = tk.Button(self.root, text="Decrypt Data File", command=self.decrypt_file)
+        self.decrypt_file_button.grid(row=38, column=0, padx=10, pady=10)
 
 
 
@@ -147,24 +168,33 @@ class DataAutomationApp:
         self.output_text.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
 
     def define_goals(self):
-        goals = {
-            "goal1": "Generate $500 monthly passive income through AI-driven content.",
-            "goal2": "Automate 80% of the content creation process."
-        }
-        with open('data/goals.json', 'w') as f:
-            json.dump(goals, f)
-        self.output_text.insert(tk.END, "Goals and objectives defined and stored in goals.json.\n")
+        try:
+            goals = {
+                "goal1": "Generate $500 monthly passive income through AI-driven content.",
+                "goal2": "Automate 80% of the content creation process."
+            }
+            with open('data/goals.json', 'w') as f:
+                json.dump(goals, f)
+            self.output_text.insert(tk.END, "Goals and objectives defined and stored in goals.json.\n")
+            log_info("Goals and objectives defined.")
+        except Exception as e:
+            self.output_text.insert(tk.END, f"Error defining goals: {e}\n")
+            log_error(f"Error defining goals: {e}")
 
     def market_research(self):
-        # Simulated market research data
-        data = {
-            "keyword": "AI content creation",
-            "volume": 10000,
-            "competition": "low"
-        }
-        with open('data/market_research.json', 'w') as f:
-            json.dump(data, f)
-        self.output_text.insert(tk.END, "Market research conducted and stored in market_research.json.\n")
+        try:
+            data = {
+                "keyword": "AI content creation",
+                "volume": 10000,
+                "competition": "low"
+            }
+            with open('data/market_research.json', 'w') as f:
+                json.dump(data, f)
+            self.output_text.insert(tk.END, "Market research conducted and stored in market_research.json.\n")
+            log_info("Market research conducted.")
+        except Exception as e:
+            self.output_text.insert(tk.END, f"Error conducting market research: {e}\n")
+            log_error(f"Error conducting market research: {e}")
 
     def evaluate_resources(self):
         resources = {
@@ -291,8 +321,6 @@ class DataAutomationApp:
         status_id = publish_to_twitter(content, api_key, api_secret_key, access_token, access_token_secret)
         self.output_text.insert(tk.END, f"Published to Twitter with status ID: {status_id}\n")
 
-
-
     def track_metrics(self):
         metrics = track_metrics()
         self.output_text.insert(tk.END, f"Performance metrics tracked and stored in data/performance_metrics.json.\n")
@@ -390,6 +418,40 @@ class DataAutomationApp:
     def analyze_twitter(self):
         insights = analyze_twitter_data('data/cleaned_twitter_data.csv')
         self.output_text.insert(tk.END, f"Twitter data analyzed. Insights stored in data/twitter_insights.json.\n{insights}\n")
+
+    def export_google_trends_csv(self):
+        df = pd.read_csv('data/cleaned_google_trends_data.csv')
+        file_path = export_to_csv(df, 'data/exported_google_trends_data.csv')
+        self.output_text.insert(tk.END, f"Google Trends data exported to {file_path}.\n")
+
+    def export_google_trends_excel(self):
+        df = pd.read_csv('data/cleaned_google_trends_data.csv')
+        file_path = export_to_excel(df, 'data/exported_google_trends_data.xlsx')
+        self.output_text.insert(tk.END, f"Google Trends data exported to {file_path}.\n")
+
+    def export_google_trends_json(self):
+        df = pd.read_csv('data/cleaned_google_trends_data.csv')
+        file_path = export_to_json(df, 'data/exported_google_trends_data.json')
+        self.output_text.insert(tk.END, f"Google Trends data exported to {file_path}.\n")
+
+    def generate_key(self):
+        key = generate_key()
+        self.output_text.insert(tk.END, "Encryption key generated and stored in data/secret.key.\n")
+
+    def encrypt_file(self):
+        file_path = 'data/cleaned_google_trends_data.csv'  # Example file to encrypt
+        encrypted_file_path = encrypt_file(file_path)
+        self.output_text.insert(tk.END, f"File {file_path} encrypted and stored as {encrypted_file_path}.\n")
+
+    def decrypt_file(self):
+        encrypted_file_path = 'data/cleaned_google_trends_data.csv.enc'  # Example encrypted file
+        decrypted_file_path = decrypt_file(encrypted_file_path)
+        self.output_text.insert(tk.END, f"File {encrypted_file_path} decrypted and stored as {decrypted_file_path}.\n")
+
+
+
+
+
 
 
 if __name__ == "__main__":
