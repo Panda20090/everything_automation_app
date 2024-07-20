@@ -43,6 +43,7 @@ class DataAutomationApp:
         create_user_table()
         setup_logging()
         self.create_login_register_frames()
+        self.create_output_text()  # Ensure output_text is created before any other widgets
         log_info("Application started")
 
     def create_login_register_frames(self):
@@ -71,6 +72,44 @@ class DataAutomationApp:
         self.register_button.grid(row=2, column=0, columnspan=2)
 
         self.main_frame = None
+
+
+    def create_output_text(self):
+        # Create output text window
+        self.output_text = scrolledtext.ScrolledText(self.root, width=50, height=20)
+        self.output_text.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
+
+    def login(self):
+        username = self.login_username.get()
+        password = self.login_password.get()
+        if verify_user(username, password):
+            self.output_text.insert(tk.END, "Login successful.\n")
+            self.show_main_interface()  # Show main interface upon successful login
+        else:
+            self.output_text.insert(tk.END, "Login failed.\n")
+
+    def register(self):
+        username = self.register_username.get()
+        password = self.register_password.get()
+        try:
+            register_user(username, password)
+            self.output_text.insert(tk.END, "Registration successful.\n")
+        except sqlite3.IntegrityError:
+            self.output_text.insert(tk.END, "Registration failed: Username already exists.\n")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     def show_main_interface(self):
         if self.main_frame is not None:

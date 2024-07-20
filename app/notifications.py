@@ -13,8 +13,8 @@ def notify(title, message):
     )
 
 def send_email(subject, body, to_email):
-    from_email = "your_email@example.com"
-    from_password = "your_email_password"
+    from_email = "pagestowages@gmail.com"
+    from_password = "Mayy5790098192011"
 
     msg = MIMEMultipart()
     msg['From'] = from_email
@@ -42,3 +42,10 @@ def generate_report(data_file, output_file):
         f.write(report)
     
     return report
+
+
+if __name__ == "__main__":
+    subject = "Test Email"
+    body = "This is a test email to verify the email sending functionality."
+    to_email = "pagestowages@gmail.com"
+    send_email(subject, body, to_email)
