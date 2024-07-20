@@ -11,3 +11,5 @@ openpyxl
 cryptography
 dropbox
 werkzeug
+PyDrive
+beautifulsoup4

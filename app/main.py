@@ -30,6 +30,9 @@ from auth import create_user_table, register_user, verify_user
 import sqlite3
 from auth import create_user_table, register_user, verify_user
 from email_reporting import send_report
+from cloud_backup import backup_to_gdrive, download_from_gdrive
+from web_scraping import scrape_website
+from advanced_charts import create_heatmap, create_histogram, create_pie_chart
 
 
 
@@ -186,6 +189,25 @@ class DataAutomationApp:
 
         self.send_email_report_button = tk.Button(self.root, text="Send Email Report", command=self.send_email_report)
         self.send_email_report_button.grid(row=46, column=0, padx=10, pady=10)
+
+        self.backup_gdrive_button = tk.Button(self.root, text="Backup to Google Drive", command=self.backup_to_gdrive)
+        self.backup_gdrive_button.grid(row=47, column=0, padx=10, pady=10)
+
+        self.download_gdrive_button = tk.Button(self.root, text="Download from Google Drive", command=self.download_from_gdrive)
+        self.download_gdrive_button.grid(row=48, column=0, padx=10, pady=10)
+
+        self.scrape_website_button = tk.Button(self.root, text="Scrape Website", command=self.scrape_website)
+        self.scrape_website_button.grid(row=49, column=0, padx=10, pady=10)
+
+        self.heatmap_button = tk.Button(self.root, text="Generate Heatmap", command=self.generate_heatmap)
+        self.heatmap_button.grid(row=50, column=0, padx=10, pady=10)
+
+        self.histogram_button = tk.Button(self.root, text="Generate Histogram", command=self.generate_histogram)
+        self.histogram_button.grid(row=51, column=0, padx=10, pady=10)
+
+        self.pie_chart_button = tk.Button(self.root, text="Generate Pie Chart", command=self.generate_pie_chart)
+        self.pie_chart_button.grid(row=52, column=0, padx=10, pady=10)
+
 
 
 
@@ -578,6 +600,50 @@ class DataAutomationApp:
     def send_email_report(self):
         send_report()
         self.output_text.insert(tk.END, "Email report sent.\n")
+
+    def backup_to_gdrive(self):
+        local_file = 'data/data_automation.db'  # Example file to upload
+        drive_folder_id = 'your_drive_folder_id'  # Replace with your actual Google Drive folder ID
+        message = backup_to_gdrive(local_file, drive_folder_id)
+        self.output_text.insert(tk.END, f"{message}\n")
+
+    def download_from_gdrive(self):
+        file_id = 'your_file_id'  # Replace with your actual Google Drive file ID
+        local_path = 'data/downloaded_data_automation.db'
+        message = download_from_gdrive(file_id, local_path)
+        self.output_text.insert(tk.END, f"{message}\n")
+
+    def scrape_website(self):
+        url = 'https://example.com'  # Replace with the actual URL
+        target_element = 'div'  # Replace with the actual target element
+        target_class = 'target-class'  # Replace with the actual target class
+        file_path = scrape_website(url, target_element, target_class)
+        if file_path:
+            self.output_text.insert(tk.END, f"Data scraped and stored in {file_path}.\n")
+        else:
+            self.output_text.insert(tk.END, "Failed to scrape data from the website.\n")
+
+    def generate_heatmap(self):
+        file_path = 'data/cleaned_google_trends_data.csv'
+        fig = create_heatmap(file_path, title='Google Trends Heatmap')
+        fig.show()
+        self.output_text.insert(tk.END, "Heatmap generated.\n")
+
+    def generate_histogram(self):
+        file_path = 'data/cleaned_google_trends_data.csv'
+        fig = create_histogram(file_path, column='normalized_value', title='Google Trends Histogram')
+        fig.show()
+        self.output_text.insert(tk.END, "Histogram generated.\n")
+
+    def generate_pie_chart(self):
+        file_path = 'data/cleaned_twitter_data.csv'
+        fig = create_pie_chart(file_path, column='text', title='Twitter Pie Chart')
+        fig.show()
+        self.output_text.insert(tk.END, "Pie chart generated.\n")
+
+
+
+
 
 
 if __name__ == "__main__":
