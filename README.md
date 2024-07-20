@@ -1,4 +1,5 @@
 # everything_automation_app# Data Automation App
+# Data Automation App
 
 A desktop application for automating data tasks with visualization.
 
