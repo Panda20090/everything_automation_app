@@ -14,7 +14,7 @@ from content_publishing import publish_to_medium, publish_to_wordpress, publish_
 from monitoring import track_metrics, analyze_feedback
 from data_cleanup import clean_google_trends_data, clean_twitter_data
 from data_storage import setup_database, insert_data, query_data
-from notifications import send_email, generate_report
+from notifications import notify, send_email, generate_report
 from scheduler import schedule_tasks
 import threading
 from backup_restore import backup_database, restore_database
@@ -34,6 +34,8 @@ from cloud_backup import backup_to_gdrive, download_from_gdrive
 from web_scraping import scrape_website
 from advanced_charts import create_heatmap, create_histogram, create_pie_chart
 from sentiment_analysis import analyze_file_sentiment
+from model_training import train_model
+from data_preprocessing import preprocess_data
 
 
 
@@ -212,6 +214,13 @@ class DataAutomationApp:
         self.sentiment_analysis_button = tk.Button(self.root, text="Analyze Sentiment", command=self.analyze_sentiment)
         self.sentiment_analysis_button.grid(row=53, column=0, padx=10, pady=10)
 
+        self.train_model_button = tk.Button(self.root, text="Train Model", command=self.train_model)
+        self.train_model_button.grid(row=54, column=0, padx=10, pady=10)
+
+        self.preprocess_data_button = tk.Button(self.root, text="Preprocess Data", command=self.preprocess_data)
+        self.preprocess_data_button.grid(row=55, column=0, padx=10, pady=10)
+
+
 
 
 
@@ -275,6 +284,8 @@ class DataAutomationApp:
                 json.dump(goals, f)
             self.output_text.insert(tk.END, "Goals and objectives defined and stored in goals.json.\n")
             log_info("Goals and objectives defined.")
+            notify("Task Completed", "Goals and objectives have been defined.")
+            send_email("Task Completed", "Goals and objectives have been defined.", "recipient@example.com")
         except Exception as e:
             self.output_text.insert(tk.END, f"Error defining goals: {e}\n")
             log_error(f"Error defining goals: {e}")
@@ -290,9 +301,13 @@ class DataAutomationApp:
                 json.dump(data, f)
             self.output_text.insert(tk.END, "Market research conducted and stored in market_research.json.\n")
             log_info("Market research conducted.")
+            notify("Task Completed", "Market research has been conducted.")
+            report = generate_report('data/market_research.json', 'reports/market_research_report.txt')
+            send_email("Task Completed", report, "recipient@example.com")
         except Exception as e:
             self.output_text.insert(tk.END, f"Error conducting market research: {e}\n")
             log_error(f"Error conducting market research: {e}")
+
 
     def evaluate_resources(self):
         resources = {
@@ -649,9 +664,20 @@ class DataAutomationApp:
         output_file = analyze_file_sentiment(file_path)
         self.output_text.insert(tk.END, f"Sentiment analysis complete. Results stored in {output_file}.\n")
 
+    def train_model(self):
+        file_path = 'data/sentiment_analysis.csv'
+        target_column = 'Sentiment'
+        accuracy, model_path = train_model(file_path, target_column)
+        self.output_text.insert(tk.END, f"Model trained with accuracy: {accuracy:.2f}\nModel saved to {model_path}\n")
 
-
-
+    def preprocess_data(self):
+        file_path = 'data/sentiment_analysis.csv'
+        target_column = 'Sentiment'
+        preprocessed_file = preprocess_data(file_path, target_column)
+        self.output_text.insert(tk.END, f"Data preprocessed and stored in {preprocessed_file}\n")
+        notify("Task Completed", "Data preprocessing is complete.")
+        report = generate_report(preprocessed_file, 'reports/preprocessed_data_report.txt')
+        send_email("Task Completed", report, "recipient@example.com")
 
 if __name__ == "__main__":
     root = tk.Tk()

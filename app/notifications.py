@@ -1,7 +1,16 @@
+from plyer import notification
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import json
+
+def notify(title, message):
+    notification.notify(
+        title=title,
+        message=message,
+        app_name='Data Automation App',
+        timeout=10
+    )
 
 def send_email(subject, body, to_email):
     from_email = "your_email@example.com"
