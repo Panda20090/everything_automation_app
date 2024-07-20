@@ -13,6 +13,13 @@ from content_generation import generate_google_trends_report, generate_twitter_r
 from content_publishing import publish_to_medium, publish_to_wordpress, publish_to_twitter
 from monitoring import track_metrics, analyze_feedback
 from data_cleanup import clean_google_trends_data, clean_twitter_data
+from data_storage import setup_database, insert_data, query_data
+from notifications import send_email, generate_report
+from scheduler import schedule_tasks
+import threading
+from backup_restore import backup_database, restore_database
+from dashboard import create_dashboard
+from data_analysis import analyze_google_trends_data, analyze_twitter_data
 
 
 
@@ -88,6 +95,42 @@ class DataAutomationApp:
 
         self.clean_twitter_button = tk.Button(self.root, text="Clean Twitter Data", command=self.clean_twitter)
         self.clean_twitter_button.grid(row=20, column=0, padx=10, pady=10)
+
+        self.store_google_trends_button = tk.Button(self.root, text="Store Google Trends Data", command=self.store_google_trends_data)
+        self.store_google_trends_button.grid(row=21, column=0, padx=10, pady=10)
+
+        self.store_twitter_button = tk.Button(self.root, text="Store Twitter Data", command=self.store_twitter_data)
+        self.store_twitter_button.grid(row=22, column=0, padx=10, pady=10)
+
+        self.query_google_trends_button = tk.Button(self.root, text="Query Google Trends Data", command=self.query_google_trends_data)
+        self.query_google_trends_button.grid(row=23, column=0, padx=10, pady=10)
+
+        self.query_twitter_button = tk.Button(self.root, text="Query Twitter Data", command=self.query_twitter_data)
+        self.query_twitter_button.grid(row=24, column=0, padx=10, pady=10)
+
+        self.send_email_button = tk.Button(self.root, text="Send Email Notification", command=self.send_email)
+        self.send_email_button.grid(row=25, column=0, padx=10, pady=10)
+
+        self.generate_report_button = tk.Button(self.root, text="Generate Report", command=self.generate_report)
+        self.generate_report_button.grid(row=26, column=0, padx=10, pady=10)
+
+        self.start_scheduler_button = tk.Button(self.root, text="Start Scheduler", command=self.start_scheduler)
+        self.start_scheduler_button.grid(row=27, column=0, padx=10, pady=10)
+
+        self.backup_database_button = tk.Button(self.root, text="Backup Database", command=self.backup_database)
+        self.backup_database_button.grid(row=28, column=0, padx=10, pady=10)
+
+        self.restore_database_button = tk.Button(self.root, text="Restore Database", command=self.restore_database)
+        self.restore_database_button.grid(row=29, column=0, padx=10, pady=10)
+
+        self.launch_dashboard_button = tk.Button(self.root, text="Launch Dashboard", command=self.launch_dashboard)
+        self.launch_dashboard_button.grid(row=30, column=0, padx=10, pady=10)
+
+        self.analyze_google_trends_button = tk.Button(self.root, text="Analyze Google Trends Data", command=self.analyze_google_trends)
+        self.analyze_google_trends_button.grid(row=31, column=0, padx=10, pady=10)
+
+        self.analyze_twitter_button = tk.Button(self.root, text="Analyze Twitter Data", command=self.analyze_twitter)
+        self.analyze_twitter_button.grid(row=32, column=0, padx=10, pady=10)
 
 
 
@@ -270,6 +313,83 @@ class DataAutomationApp:
         self.show_chart(df)
 
 
+    def store_google_trends_data(self):
+        conn = setup_database()
+        df = pd.read_csv('data/cleaned_google_trends_data.csv')
+        for index, row in df.iterrows():
+            data = {
+                'date': row['date'],
+                'value': row['normalized_value']
+            }
+            insert_data(conn, 'google_trends', data)
+        self.output_text.insert(tk.END, "Google Trends data stored in the database.\n")
+
+    def store_twitter_data(self):
+        conn = setup_database()
+        df = pd.read_csv('data/cleaned_twitter_data.csv')
+        for index, row in df.iterrows():
+            data = {
+                'created_at': row['created_at'],
+                'text': row['text']
+            }
+            insert_data(conn, 'twitter', data)
+        self.output_text.insert(tk.END, "Twitter data stored in the database.\n")
+
+    def query_google_trends_data(self):
+        conn = setup_database()
+        query = "SELECT * FROM google_trends"
+        rows = query_data(conn, query)
+        for row in rows:
+            self.output_text.insert(tk.END, f"{row}\n")
+
+    def query_twitter_data(self):
+        conn = setup_database()
+        query = "SELECT * FROM twitter"
+        rows = query_data(conn, query)
+        for row in rows:
+            self.output_text.insert(tk.END, f"{row}\n")
+
+    def send_email(self):
+        subject = "Automated Data Report"
+        body = "Your data report is ready."
+        to_email = "recipient@example.com"
+        send_email(subject, body, to_email)
+        self.output_text.insert(tk.END, "Email notification sent.\n")
+
+    def generate_report(self):
+        data_file = 'data/performance_metrics.json'
+        output_file = 'data/performance_report.txt'
+        report = generate_report(data_file, output_file)
+        self.output_text.insert(tk.END, f"Report generated and stored in {output_file}.\n{report}\n")
+
+    def start_scheduler(self):
+        scheduler_thread = threading.Thread(target=schedule_tasks)
+        scheduler_thread.start()
+        self.output_text.insert(tk.END, "Scheduler started.\n")
+
+    def backup_database(self):
+        backup_path = backup_database()
+        self.output_text.insert(tk.END, f"Database backed up to {backup_path}.\n")
+
+    def restore_database(self):
+        restore_path = restore_database()
+        if restore_path:
+            self.output_text.insert(tk.END, f"Database restored from {restore_path}.\n")
+        else:
+            self.output_text.insert(tk.END, "No backup found to restore.\n")
+
+    def launch_dashboard(self):
+        dashboard_thread = threading.Thread(target=create_dashboard)
+        dashboard_thread.start()
+        self.output_text.insert(tk.END, "Dashboard launched.\n")
+
+    def analyze_google_trends(self):
+        insights = analyze_google_trends_data('data/cleaned_google_trends_data.csv')
+        self.output_text.insert(tk.END, f"Google Trends data analyzed. Insights stored in data/google_trends_insights.json.\n{insights}\n")
+
+    def analyze_twitter(self):
+        insights = analyze_twitter_data('data/cleaned_twitter_data.csv')
+        self.output_text.insert(tk.END, f"Twitter data analyzed. Insights stored in data/twitter_insights.json.\n{insights}\n")
 
 
 if __name__ == "__main__":
