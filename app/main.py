@@ -23,6 +23,13 @@ from data_analysis import analyze_google_trends_data, analyze_twitter_data
 from data_export import export_to_csv, export_to_excel, export_to_json
 from data_security import generate_key, encrypt_file, decrypt_file
 from log_management import setup_logging, log_info, log_error
+from api_key_management import generate_key, encrypt_api_key, decrypt_api_key
+from visualization_enhancements import enhanced_visualization
+from data_sync import upload_to_dropbox, download_from_dropbox
+from auth import create_user_table, register_user, verify_user
+import sqlite3
+from auth import create_user_table, register_user, verify_user
+from email_reporting import send_report
 
 
 
@@ -32,6 +39,7 @@ class DataAutomationApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Data Automation Application")
+        create_user_table()
         setup_logging()
         self.create_widgets()
         log_info("Application started")
@@ -154,6 +162,71 @@ class DataAutomationApp:
 
         self.decrypt_file_button = tk.Button(self.root, text="Decrypt Data File", command=self.decrypt_file)
         self.decrypt_file_button.grid(row=38, column=0, padx=10, pady=10)
+
+        self.generate_api_key_button = tk.Button(self.root, text="Generate API Key Encryption Key", command=self.generate_api_key_key)
+        self.generate_api_key_button.grid(row=39, column=0, padx=10, pady=10)
+
+        self.encrypt_api_key_button = tk.Button(self.root, text="Encrypt API Key", command=self.encrypt_api_key)
+        self.encrypt_api_key_button.grid(row=40, column=0, padx=10, pady=10)
+
+        self.decrypt_api_key_button = tk.Button(self.root, text="Decrypt API Key", command=self.decrypt_api_key)
+        self.decrypt_api_key_button.grid(row=41, column=0, padx=10, pady=10)
+
+        self.enhanced_google_trends_button = tk.Button(self.root, text="Enhanced Google Trends Visualization", command=self.enhanced_google_trends)
+        self.enhanced_google_trends_button.grid(row=42, column=0, padx=10, pady=10)
+
+        self.enhanced_twitter_button = tk.Button(self.root, text="Enhanced Twitter Visualization", command=self.enhanced_twitter)
+        self.enhanced_twitter_button.grid(row=43, column=0, padx=10, pady=10)
+
+        self.upload_dropbox_button = tk.Button(self.root, text="Upload to Dropbox", command=self.upload_to_dropbox)
+        self.upload_dropbox_button.grid(row=44, column=0, padx=10, pady=10)
+
+        self.download_dropbox_button = tk.Button(self.root, text="Download from Dropbox", command=self.download_from_dropbox)
+        self.download_dropbox_button.grid(row=45, column=0, padx=10, pady=10)
+
+        self.send_email_report_button = tk.Button(self.root, text="Send Email Report", command=self.send_email_report)
+        self.send_email_report_button.grid(row=46, column=0, padx=10, pady=10)
+
+
+
+
+
+
+
+
+
+
+
+        #login and registration frame
+        self.login_frame = tk.Frame(self.root)
+        self.login_frame.grid(row=0, column=0, padx=10, pady=10)
+
+        self.register_frame = tk.Frame(self.root)
+        self.register_frame.grid(row=1, column=0, padx=10, pady=10)
+
+        tk.Label(self.login_frame, text="Username").grid(row=0, column=0)
+        tk.Label(self.login_frame, text="Password").grid(row=1, column=0)
+        self.login_username = tk.Entry(self.login_frame)
+        self.login_username.grid(row=0, column=1)
+        self.login_password = tk.Entry(self.login_frame, show='*')
+        self.login_password.grid(row=1, column=1)
+        self.login_button = tk.Button(self.login_frame, text="Login", command=self.login)
+        self.login_button.grid(row=2, column=0, columnspan=2)
+
+        tk.Label(self.register_frame, text="Username").grid(row=0, column=0)
+        tk.Label(self.register_frame, text="Password").grid(row=1, column=0)
+        self.register_username = tk.Entry(self.register_frame)
+        self.register_username.grid(row=0, column=1)
+        self.register_password = tk.Entry(self.register_frame, show='*')
+        self.register_password.grid(row=1, column=1)
+        self.register_button = tk.Button(self.register_frame, text="Register", command=self.register)
+        self.register_button.grid(row=2, column=0, columnspan=2)
+
+
+
+
+
+
 
 
 
@@ -448,10 +521,63 @@ class DataAutomationApp:
         decrypted_file_path = decrypt_file(encrypted_file_path)
         self.output_text.insert(tk.END, f"File {encrypted_file_path} decrypted and stored as {decrypted_file_path}.\n")
 
+    def generate_api_key_key(self):
+        generate_key()
+        self.output_text.insert(tk.END, "API key encryption key generated and stored in data/secret.key.\n")
 
+    def encrypt_api_key(self):
+        api_key = 'your_api_key'  # Replace this with the actual API key to encrypt
+        encrypt_api_key(api_key)
+        self.output_text.insert(tk.END, "API key encrypted and stored in data/encrypted_api_key.enc.\n")
 
+    def decrypt_api_key(self):
+        decrypted_api_key = decrypt_api_key()
+        self.output_text.insert(tk.END, f"Decrypted API key: {decrypted_api_key}\n")
 
+    def enhanced_google_trends(self):
+        fig = enhanced_visualization('data/cleaned_google_trends_data.csv', chart_type='line', title='Enhanced Google Trends Data')
+        fig.show()
+        self.output_text.insert(tk.END, "Enhanced Google Trends visualization generated.\n")
 
+    def enhanced_twitter(self):
+        fig = enhanced_visualization('data/cleaned_twitter_data.csv', chart_type='scatter', title='Enhanced Twitter Data')
+        fig.show()
+        self.output_text.insert(tk.END, "Enhanced Twitter visualization generated.\n")
+
+    def upload_to_dropbox(self):
+        local_file = 'data/cleaned_google_trends_data.csv'  # Example file to upload
+        dropbox_path = '/data/cleaned_google_trends_data.csv'
+        access_token = 'your_dropbox_access_token'  # Replace with your actual access token
+        message = upload_to_dropbox(local_file, dropbox_path, access_token)
+        self.output_text.insert(tk.END, f"{message}\n")
+
+    def download_from_dropbox(self):
+        dropbox_path = '/data/cleaned_google_trends_data.csv'
+        local_file = 'data/downloaded_google_trends_data.csv'
+        access_token = 'your_dropbox_access_token'  # Replace with your actual access token
+        message = download_from_dropbox(dropbox_path, local_file, access_token)
+        self.output_text.insert(tk.END, f"{message}\n")
+
+    def login(self):
+        username = self.login_username.get()
+        password = self.login_password.get()
+        if verify_user(username, password):
+            self.output_text.insert(tk.END, "Login successful.\n")
+        else:
+            self.output_text.insert(tk.END, "Login failed.\n")
+
+    def register(self):
+        username = self.register_username.get()
+        password = self.register_password.get()
+        try:
+            register_user(username, password)
+            self.output_text.insert(tk.END, "Registration successful.\n")
+        except sqlite3.IntegrityError:
+            self.output_text.insert(tk.END, "Registration failed: Username already exists.\n")
+
+    def send_email_report(self):
+        send_report()
+        self.output_text.insert(tk.END, "Email report sent.\n")
 
 
 if __name__ == "__main__":

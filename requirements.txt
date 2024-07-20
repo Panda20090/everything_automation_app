@@ -9,3 +9,5 @@ dash
 plotly
 openpyxl
 cryptography
+dropbox
+werkzeug
