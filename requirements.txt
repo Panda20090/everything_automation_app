@@ -13,3 +13,4 @@ dropbox
 werkzeug
 PyDrive
 beautifulsoup4
+textblob

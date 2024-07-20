@@ -33,6 +33,7 @@ from email_reporting import send_report
 from cloud_backup import backup_to_gdrive, download_from_gdrive
 from web_scraping import scrape_website
 from advanced_charts import create_heatmap, create_histogram, create_pie_chart
+from sentiment_analysis import analyze_file_sentiment
 
 
 
@@ -208,6 +209,8 @@ class DataAutomationApp:
         self.pie_chart_button = tk.Button(self.root, text="Generate Pie Chart", command=self.generate_pie_chart)
         self.pie_chart_button.grid(row=52, column=0, padx=10, pady=10)
 
+        self.sentiment_analysis_button = tk.Button(self.root, text="Analyze Sentiment", command=self.analyze_sentiment)
+        self.sentiment_analysis_button.grid(row=53, column=0, padx=10, pady=10)
 
 
 
@@ -641,6 +644,10 @@ class DataAutomationApp:
         fig.show()
         self.output_text.insert(tk.END, "Pie chart generated.\n")
 
+    def analyze_sentiment(self):
+        file_path = 'data/cleaned_twitter_data.csv'
+        output_file = analyze_file_sentiment(file_path)
+        self.output_text.insert(tk.END, f"Sentiment analysis complete. Results stored in {output_file}.\n")
 
 
 
