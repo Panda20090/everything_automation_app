@@ -1,2 +1,11 @@
 pandas
 matplotlib
+jinja2
+requests
+tweepy
+python-wordpress-xmlrpc
+schedule
+dash
+plotly
+openpyxl
+cryptography
