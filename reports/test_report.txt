@@ -1,0 +1,5 @@
+Report for data/market_research.json:
+
+keyword: AI content creation
+volume: 10000
+competition: low

@@ -1,0 +1,12 @@
+{
+  "google_trends_api_key": "YOUR_GOOGLE_TRENDS_API_KEY",
+  "twitter_api_key": "YOUR_TWITTER_API_KEY",
+  "medium_access_token": "YOUR_MEDIUM_ACCESS_TOKEN",
+  "wordpress": {
+      "url": "https://yourblog.wordpress.com/xmlrpc.php",
+      "username": "pagestowages@gmail.com",
+      "password": "wtzc dqkv ojvv pqrb"
+  },
+  "dropbox_access_token": "YOUR_DROPBOX_ACCESS_TOKEN",
+  "google_drive_folder_id": "YOUR_GOOGLE_DRIVE_FOLDER_ID"
+}
