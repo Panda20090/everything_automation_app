@@ -43,9 +43,3 @@ def generate_report(data_file, output_file):
     
     return report
 
-
-if __name__ == "__main__":
-    subject = "Test Email"
-    body = "This is a test email to verify the email sending functionality."
-    to_email = "pagestowages@gmail.com"
-    send_email(subject, body, to_email)

@@ -1,3 +1,4 @@
+import os
 import tkinter as tk
 from tkinter import ttk, scrolledtext
 import matplotlib.pyplot as plt
@@ -43,8 +44,12 @@ class DataAutomationApp:
         create_user_table()
         setup_logging()
         self.create_login_register_frames()
-        self.create_output_text()  # Ensure output_text is created before any other widgets
+        self.create_output_text()
         log_info("Application started")
+        required_directories = ['data', 'assets/charts', 'reports']
+        for directory in required_directories:
+            if not os.path.exists(directory):
+                os.makedirs(directory)
 
     def create_login_register_frames(self):
         self.login_frame = tk.Frame(self.root)
@@ -73,9 +78,7 @@ class DataAutomationApp:
 
         self.main_frame = None
 
-
     def create_output_text(self):
-        # Create output text window
         self.output_text = scrolledtext.ScrolledText(self.root, width=50, height=20)
         self.output_text.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
 
@@ -84,7 +87,7 @@ class DataAutomationApp:
         password = self.login_password.get()
         if verify_user(username, password):
             self.output_text.insert(tk.END, "Login successful.\n")
-            self.show_main_interface()  # Show main interface upon successful login
+            self.show_main_interface()
         else:
             self.output_text.insert(tk.END, "Login failed.\n")
 
@@ -97,30 +100,15 @@ class DataAutomationApp:
         except sqlite3.IntegrityError:
             self.output_text.insert(tk.END, "Registration failed: Username already exists.\n")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def show_main_interface(self):
         if self.main_frame is not None:
             self.main_frame.destroy()
-        
+
         self.main_frame = tk.Frame(self.root)
         self.main_frame.grid(row=0, column=0, padx=10, pady=10)
         self.create_main_interface()
 
     def create_main_interface(self):
-        # Create buttons for each automation task in the main frame
         self.main_buttons = [
             ("Define Goals and Objectives", self.define_goals),
             ("Conduct Market Research", self.market_research),
@@ -181,35 +169,11 @@ class DataAutomationApp:
         for i, (text, command) in enumerate(self.main_buttons):
             tk.Button(self.main_frame, text=text, command=command).grid(row=i, column=0, padx=10, pady=5, sticky='ew')
 
-        # Create frame for graphs/charts
         self.chart_frame = ttk.LabelFrame(self.main_frame, text="Graphs/Charts")
         self.chart_frame.grid(row=0, column=1, rowspan=15, padx=10, pady=10)
 
-        # Create output text window
         self.output_text = scrolledtext.ScrolledText(self.main_frame, width=50, height=20)
         self.output_text.grid(row=15, column=0, columnspan=2, padx=10, pady=10)
-
-    def login(self):
-        username = self.login_username.get()
-        password = self.login_password.get()
-        if verify_user(username, password):
-            self.login_frame.grid_forget()
-            self.register_frame.grid_forget()
-            self.show_main_interface()
-            self.output_text.insert(tk.END, "Login successful.\n")
-        else:
-            self.output_text.insert(tk.END, "Login failed.\n")
-
-    def register(self):
-        username = self.register_username.get()
-        password = self.register_password.get()
-        try:
-            register_user(username, password)
-            self.output_text.insert(tk.END, "Registration successful.\n")
-        except sqlite3.IntegrityError:
-            self.output_text.insert(tk.END, "Registration failed: Username already exists.\n")
-
-    # Define the functions for each button below...
 
     def define_goals(self):
         try:
@@ -219,10 +183,10 @@ class DataAutomationApp:
             }
             with open('data/goals.json', 'w') as f:
                 json.dump(goals, f)
-            self.output_text.insert(tk.END, "Goals and objectives defined and stored in goals.json.\n")
-            log_info("Goals and objectives defined.")
-            notify("Task Completed", "Goals and objectives have been defined.")
-            send_email("Task Completed", "Goals and objectives have been defined.", "recipient@example.com")
+                self.output_text.insert(tk.END, "Goals and objectives defined and stored in goals.json.\n")
+                log_info("Goals and objectives defined.")
+                notify("Task Completed", "Goals and objectives have been defined.")
+                send_email("Task Completed", "Goals and objectives have been defined.", "pagestowages@gmail.com")
         except Exception as e:
             self.output_text.insert(tk.END, f"Error defining goals: {e}\n")
             log_error(f"Error defining goals: {e}")
@@ -240,7 +204,7 @@ class DataAutomationApp:
             log_info("Market research conducted.")
             notify("Task Completed", "Market research has been conducted.")
             report = generate_report('data/market_research.json', 'reports/market_research_report.txt')
-            send_email("Task Completed", report, "recipient@example.com")
+            send_email("Task Completed", report, "pagestowages@gmail.com")
         except Exception as e:
             self.output_text.insert(tk.END, f"Error conducting market research: {e}\n")
             log_error(f"Error conducting market research: {e}")
@@ -309,30 +273,45 @@ class DataAutomationApp:
         self.output_text.insert(tk.END, "Twitter data retrieved and stored in data/twitter_data.json.\n")
     
     def process_google_trends(self):
-        df = process_google_trends_data('data/google_trends_data.json')
-        self.output_text.insert(tk.END, "Google Trends data processed and stored in data/processed_google_trends_data.csv.\n")
-        self.show_chart(df)
+        try:
+            df = process_google_trends_data('data/google_trends_data.json')
+            self.output_text.insert(tk.END, "Google Trends data processed and stored in data/processed_google_trends_data.csv.\n")
+            self.show_chart(df)
+        except FileNotFoundError:
+            self.output_text.insert(tk.END, "Google Trends data file not found.\n")
 
     def process_twitter(self):
-        df = process_twitter_data('data/twitter_data.json')
-        self.output_text.insert(tk.END, "Twitter data processed and stored in data/processed_twitter_data.csv.\n")
-        self.show_chart(df)
+        try:
+            df = process_twitter_data('data/twitter_data.json')
+            self.output_text.insert(tk.END, "Twitter data processed and stored in data/processed_twitter_data.csv.\n")
+            self.show_chart(df)
+        except FileNotFoundError:
+            self.output_text.insert(tk.END, "Twitter data file not found.\n")
 
     def visualize_google_trends(self):
-        output_file = visualize_data('data/processed_google_trends_data.csv', 'Google Trends Data', 'assets/charts/google_trends_visualization.png')
-        self.output_text.insert(tk.END, f"Google Trends data visualized and saved to {output_file}.\n")
-        self.show_image(output_file)
+        try:
+            output_file = visualize_data('data/processed_google_trends_data.csv', 'Google Trends Data', 'assets/charts/google_trends_visualization.png')
+            self.output_text.insert(tk.END, f"Google Trends data visualized and saved to {output_file}.\n")
+            self.show_image(output_file)
+        except FileNotFoundError:
+            self.output_text.insert(tk.END, "Processed Google Trends data file not found.\n")
 
     def visualize_twitter(self):
-        output_file = visualize_data('data/processed_twitter_data.csv', 'Twitter Data', 'assets/charts/twitter_visualization.png')
-        self.output_text.insert(tk.END, f"Twitter data visualized and saved to {output_file}.\n")
-        self.show_image(output_file)
+        try:
+            output_file = visualize_data('data/processed_twitter_data.csv', 'Twitter Data', 'assets/charts/twitter_visualization.png')
+            self.output_text.insert(tk.END, f"Twitter data visualized and saved to {output_file}.\n")
+            self.show_image(output_file)
+        except FileNotFoundError:
+            self.output_text.insert(tk.END, "Processed Twitter data file not found.\n")
 
     def show_image(self, image_path):
-        img = tk.PhotoImage(file=image_path)
-        img_label = tk.Label(self.chart_frame, image=img)
-        img_label.image = img
-        img_label.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        if os.path.exists(image_path):
+            img = tk.PhotoImage(file=image_path)
+            img_label = tk.Label(self.chart_frame, image=img)
+            img_label.image = img
+            img_label.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        else:
+            self.output_text.insert(tk.END, f"Image file {image_path} not found.\n")
 
     def generate_google_trends_report(self):
         output_file = generate_google_trends_report()
@@ -371,65 +350,82 @@ class DataAutomationApp:
         self.output_text.insert(tk.END, f"Published to Twitter with status ID: {status_id}\n")
 
     def track_metrics(self):
-        metrics = track_metrics()
-        self.output_text.insert(tk.END, f"Performance metrics tracked and stored in data/performance_metrics.json.\n")
+        try:
+            metrics = track_metrics()
+            self.output_text.insert(tk.END, f"Performance metrics tracked and stored in data/performance_metrics.json.\n")
+        except Exception as e:
+            self.output_text.insert(tk.END, f"Error tracking metrics: {e}\n")
 
     def analyze_feedback(self):
-        feedback_file = 'data/feedback.json'
-        analysis = analyze_feedback(feedback_file)
-        self.output_text.insert(tk.END, f"Feedback analyzed and stored in data/feedback_analysis.json.\n")
+        try:
+            feedback_file = 'data/feedback.json'
+            analysis = analyze_feedback(feedback_file)
+            self.output_text.insert(tk.END, f"Feedback analyzed and stored in data/feedback_analysis.json.\n")
+        except FileNotFoundError:
+            self.output_text.insert(tk.END, "Feedback data file not found.\n")
 
     def clean_google_trends(self):
-        df = clean_google_trends_data('data/processed_google_trends_data.csv')
-        self.output_text.insert(tk.END, "Google Trends data cleaned and stored in data/cleaned_google_trends_data.csv.\n")
-        self.show_chart(df)
+        try:
+            df = clean_google_trends_data('data/processed_google_trends_data.csv')
+            self.output_text.insert(tk.END, "Google Trends data cleaned and stored in data/cleaned_google_trends_data.csv.\n")
+            self.show_chart(df)
+        except FileNotFoundError:
+            self.output_text.insert(tk.END, "Processed Google Trends data file not found.\n")
 
     def clean_twitter(self):
-        df = clean_twitter_data('data/processed_twitter_data.csv')
-        self.output_text.insert(tk.END, "Twitter data cleaned and stored in data/cleaned_twitter_data.csv.\n")
-        self.show_chart(df)
+        try:
+            df = clean_twitter_data('data/processed_twitter_data.csv')
+            self.output_text.insert(tk.END, "Twitter data cleaned and stored in data/cleaned_twitter_data.csv.\n")
+            self.show_chart(df)
+        except FileNotFoundError:
+            self.output_text.insert(tk.END, "Processed Twitter data file not found.\n")
 
     def store_google_trends_data(self):
-        conn = setup_database()
-        df = pd.read_csv('data/cleaned_google_trends_data.csv')
-        for index, row in df.iterrows():
-            data = {
-                'date': row['date'],
-                'value': row['normalized_value']
-            }
-            insert_data(conn, 'google_trends', data)
-        self.output_text.insert(tk.END, "Google Trends data stored in the database.\n")
+        try:
+            conn = setup_database()
+            df = pd.read_csv('data/cleaned_google_trends_data.csv')
+            for index, row in df.iterrows():
+                data = {
+                    'date': row['date'],
+                    'value': row['normalized_value']
+                }
+                insert_data(conn, 'google_trends', data)
+            self.output_text.insert(tk.END, "Google Trends data stored in the database.\n")
+        except FileNotFoundError:
+            self.output_text.insert(tk.END, "Cleaned Google Trends data file not found.\n")
 
     def store_twitter_data(self):
-        conn = setup_database()
-        df = pd.read_csv('data/cleaned_twitter_data.csv')
-        for index, row in df.iterrows():
-            data = {
-                'created_at': row['created_at'],
-                'text': row['text']
-            }
-            insert_data(conn, 'twitter', data)
-        self.output_text.insert(tk.END, "Twitter data stored in the database.\n")
+        try:
+            conn = setup_database()
+            df = pd.read_csv('data/cleaned_twitter_data.csv')
+            for index, row in df.iterrows():
+                data = {
+                    'created_at': row['created_at'],
+                    'text': row['text']
+                }
+                insert_data(conn, 'twitter', data)
+            self.output_text.insert(tk.END, "Twitter data stored in the database.\n")
+        except FileNotFoundError:
+            self.output_text.insert(tk.END, "Cleaned Twitter data file not found.\n")
 
     def query_google_trends_data(self):
         conn = setup_database()
         query = "SELECT * FROM google_trends"
-        rows = query_data(conn, query)  # Ensure rows is defined here
+        rows = query_data(conn, query)
         for row in rows:
             self.output_text.insert(tk.END, f"{row}\n")
 
     def query_twitter_data(self):
         conn = setup_database()
         query = "SELECT * FROM twitter"
-        rows = query_data(conn, query)  # Ensure rows is defined here
+        rows = query_data(conn, query)
         for row in rows:
             self.output_text.insert(tk.END, f"{row}\n")
-
 
     def send_email(self):
         subject = "Automated Data Report"
         body = "Your data report is ready."
-        to_email = "recipient@example.com"
+        to_email = "pagestowages@gmail.com"
         send_email(subject, body, to_email)
         self.output_text.insert(tk.END, "Email notification sent.\n")
 
@@ -599,6 +595,16 @@ class DataAutomationApp:
         send_email("Task Completed", report, "recipient@example.com")
 
 if __name__ == "__main__":
+    # Initialize the root Tkinter window
     root = tk.Tk()
     app = DataAutomationApp(root)
     root.mainloop()
+
+    # Test email functionality
+    subject = "Test Email"
+    body = "This is a test email to verify the email sending functionality."
+    to_email = "recipient@example.com"
+    send_email(subject, body, to_email)
+
+
+
