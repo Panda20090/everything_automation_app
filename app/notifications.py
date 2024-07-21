@@ -1,20 +1,13 @@
-from plyer import notification
 import smtplib
-from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-import json
+from email.mime.multipart import MIMEMultipart
 
-def notify(title, message):
-    notification.notify(
-        title=title,
-        message=message,
-        app_name='Data Automation App',
-        timeout=10
-    )
+def notify(subject, body):
+    print(f"Notification: {subject}\n{body}")
 
 def send_email(subject, body, to_email):
     from_email = "pagestowages@gmail.com"
-    from_password = "nsxm wnrm nvcq gamm"
+    from_password = "wtzc dqkv ojvv pqrb"
 
     msg = MIMEMultipart()
     msg['From'] = from_email
@@ -23,23 +16,19 @@ def send_email(subject, body, to_email):
 
     msg.attach(MIMEText(body, 'plain'))
 
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login(from_email, from_password)
-    text = msg.as_string()
-    server.sendmail(from_email, to_email, text)
-    server.quit()
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(from_email, from_password)
+        text = msg.as_string()
+        server.sendmail(from_email, to_email, text)
+        server.quit()
+    except Exception as e:
+        print(f"Failed to send email: {e}")
 
 def generate_report(data_file, output_file):
-    with open(data_file, 'r') as f:
-        data = json.load(f)
-    
-    report = f"Report for {data_file}:\n\n"
-    for key, value in data.items():
-        report += f"{key}: {value}\n"
-    
-    with open(output_file, 'w') as f:
-        f.write(report)
-    
-    return report
-
+    with open(data_file, 'r') as file:
+        data = file.read()
+    with open(output_file, 'w') as file:
+        file.write(data)
+    return data

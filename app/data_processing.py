@@ -3,18 +3,24 @@ import os
 
 def process_google_trends_data(file_path):
     if not os.path.exists(file_path):
-        raise FileNotFoundError(f"File {file_path} does not exist")
-    data = pd.read_json(file_path)
-    trends = data.get('trends', [])
-    df = pd.DataFrame(trends)
-    df.to_csv('data/processed_google_trends_data.csv', index=False)
-    return df
+        raise FileNotFoundError(f"{file_path} does not exist.")
+    
+    with open(file_path, 'r') as f:
+        data = f.read()
+    
+    if data.strip() == "":
+        raise ValueError("No data to process.")
+    
+    return pd.read_json(file_path)
 
 def process_twitter_data(file_path):
     if not os.path.exists(file_path):
-        raise FileNotFoundError(f"File {file_path} does not exist")
-    data = pd.read_json(file_path)
-    tweets = data.get('data', [])
-    df = pd.DataFrame(tweets)
-    df.to_csv('data/processed_twitter_data.csv', index=False)
-    return df
+        raise FileNotFoundError(f"{file_path} does not exist.")
+    
+    with open(file_path, 'r') as f:
+        data = f.read()
+    
+    if data.strip() == "":
+        raise ValueError("No data to process.")
+    
+    return pd.read_json(file_path)

@@ -1,13 +1,16 @@
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+import os
 
 def create_user_table():
-    conn = sqlite3.connect('data/users.db')
+    db_path = 'data/users.db'
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL UNIQUE,
+            username TEXT UNIQUE NOT NULL,
             password TEXT NOT NULL
         )
     ''')
