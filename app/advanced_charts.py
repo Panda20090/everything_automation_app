@@ -1,18 +1,25 @@
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 def create_heatmap(file_path, title='Heatmap'):
     df = pd.read_csv(file_path)
-    fig = px.imshow(df.corr(), title=title)
-    return fig
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(df.corr(), annot=True, cmap='coolwarm')
+    plt.title(title)
+    plt.show()
 
 def create_histogram(file_path, column, title='Histogram'):
     df = pd.read_csv(file_path)
-    fig = px.histogram(df, x=column, title=title)
-    return fig
+    plt.figure(figsize=(10, 8))
+    sns.histplot(df[column], kde=True)
+    plt.title(title)
+    plt.show()
 
 def create_pie_chart(file_path, column, title='Pie Chart'):
     df = pd.read_csv(file_path)
-    fig = px.pie(df, names=column, title=title)
-    return fig
+    plt.figure(figsize=(10, 8))
+    df[column].value_counts().plot.pie(autopct='%1.1f%%')
+    plt.title(title)
+    plt.ylabel('')
+    plt.show()

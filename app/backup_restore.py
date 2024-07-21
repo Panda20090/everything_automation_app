@@ -2,18 +2,16 @@ import shutil
 import os
 
 def backup_database():
-    source = 'data/data_automation.db'
-    destination = 'backup/data_automation_backup.db'
-    if not os.path.exists('backup'):
-        os.makedirs('backup')
+    source = 'data/users.db'
+    destination = 'data/backup/users_backup.db'
+    os.makedirs(os.path.dirname(destination), exist_ok=True)
     shutil.copyfile(source, destination)
     return destination
 
 def restore_database():
-    source = 'backup/data_automation_backup.db'
-    destination = 'data/data_automation.db'
+    source = 'data/backup/users_backup.db'
+    destination = 'data/users.db'
     if os.path.exists(source):
         shutil.copyfile(source, destination)
-        return destination
-    else:
-        return None
+        return source
+    return None
