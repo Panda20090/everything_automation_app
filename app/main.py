@@ -36,6 +36,8 @@ from advanced_charts import create_heatmap, create_histogram, create_pie_chart
 from sentiment_analysis import analyze_file_sentiment
 from model_training import train_model
 from data_preprocessing import preprocess_data
+from dash import dcc, html
+
 
 class DataAutomationApp:
     def __init__(self, root):

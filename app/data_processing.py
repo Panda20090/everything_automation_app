@@ -1,17 +1,26 @@
 import pandas as pd
+import os
 
 def process_google_trends_data(file_path):
-    data = pd.read_json(file_path)
-    # Example processing: Extracting required information and creating a DataFrame
-    trends = data.get('trends', [])
-    df = pd.DataFrame(trends)
-    df.to_csv('data/processed_google_trends_data.csv', index=False)
-    return df
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"{file_path} does not exist.")
+    
+    with open(file_path, 'r') as f:
+        data = f.read()
+    
+    if data.strip() == "":
+        raise ValueError("No data to process.")
+    
+    return pd.read_json(file_path)
 
 def process_twitter_data(file_path):
-    data = pd.read_json(file_path)
-    # Example processing: Extracting tweet texts and creating a DataFrame
-    tweets = data.get('data', [])
-    df = pd.DataFrame(tweets)
-    df.to_csv('data/processed_twitter_data.csv', index=False)
-    return df
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"{file_path} does not exist.")
+    
+    with open(file_path, 'r') as f:
+        data = f.read()
+    
+    if data.strip() == "":
+        raise ValueError("No data to process.")
+    
+    return pd.read_json(file_path)
