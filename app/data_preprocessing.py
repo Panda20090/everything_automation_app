@@ -1,25 +1,11 @@
 import pandas as pd
-from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.model_selection import train_test_split
 
 def preprocess_data(file_path, target_column):
     df = pd.read_csv(file_path)
     X = df.drop(columns=[target_column])
     y = df[target_column]
-
-    # Encode categorical variables
-    X = pd.get_dummies(X)
-
-    # Scale features
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-
-    # Encode target variable if it's categorical
-    if y.dtype == 'object':
-        encoder = LabelEncoder()
-        y = encoder.fit_transform(y)
-
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     preprocessed_file = 'data/preprocessed_data.csv'
-    pd.DataFrame(X_scaled, columns=X.columns).to_csv(preprocessed_file, index=False)
-    pd.DataFrame(y, columns=[target_column]).to_csv(preprocessed_file, mode='a', header=True, index=False)
-
+    pd.concat([X_train, y_train], axis=1).to_csv(preprocessed_file, index=False)
     return preprocessed_file
