@@ -9,13 +9,23 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-openai.api_key = os.getenv('API_KEY')  # Ensure to use environment variable for API key
+# Ensure the OpenAI API key is set via environment variable
+openai.api_key = os.getenv('API_KEY')
 
 # Ensure the output directory exists
 output_dir = os.path.join(os.path.dirname(__file__), '../output_files')
 os.makedirs(output_dir, exist_ok=True)
 
 def summarize_code(file_content):
+    """
+    Summarize the provided code content using OpenAI API.
+    
+    Parameters:
+        file_content (str): The content of the code file.
+
+    Returns:
+        str: Summary of the code.
+    """
     try:
         response = openai.Completion.create(
             model="gpt-4o-mini",
@@ -29,6 +39,15 @@ def summarize_code(file_content):
         return ""
 
 def verify_code(file_content):
+    """
+    Verify the provided code content using OpenAI API.
+    
+    Parameters:
+        file_content (str): The content of the code file.
+
+    Returns:
+        str: Verification result of the code.
+    """
     try:
         response = openai.Completion.create(
             model="gpt-3.5-turbo-0125",
@@ -42,6 +61,15 @@ def verify_code(file_content):
         return ""
 
 def list_files_and_directories(root_directory):
+    """
+    List all files and directories within the root_directory.
+    
+    Parameters:
+        root_directory (str): The root directory to search for files and directories.
+
+    Returns:
+        dict: A dictionary containing lists of files and directories.
+    """
     files_and_dirs = {
         "files": [],
         "directories": []
@@ -59,12 +87,29 @@ def list_files_and_directories(root_directory):
     return files_and_dirs
 
 def chunk_file(file_path, chunk_size=5000):
+    """
+    Chunk a file into smaller parts.
+    
+    Parameters:
+        file_path (str): Path to the file.
+        chunk_size (int): Size of each chunk in characters.
+
+    Yields:
+        str: Chunk of file content.
+    """
     with open(file_path, 'r') as file:
         content = file.read()
         for i in range(0, len(content), chunk_size):
             yield content[i:i + chunk_size]
 
 def save_file_list(root_directory, output_file="file_list.txt"):
+    """
+    Save a list of files and directories in the root directory to a JSON file.
+    
+    Parameters:
+        root_directory (str): The root directory to list files and directories from.
+        output_file (str): The name of the output file.
+    """
     output_path = os.path.join(output_dir, output_file)
     files_and_dirs = list_files_and_directories(root_directory)
 
@@ -76,6 +121,12 @@ def save_file_list(root_directory, output_file="file_list.txt"):
     process_files(files_and_dirs)
 
 def process_files(files_and_dirs):
+    """
+    Process each file by summarizing and verifying it. Logs the results.
+    
+    Parameters:
+        files_and_dirs (dict): A dictionary containing lists of files and directories.
+    """
     log_file_path = os.path.join(output_dir, "GPTlog.txt")
     corrections_file_path = os.path.join(output_dir, "corrections_list.txt")
 
@@ -89,6 +140,14 @@ def process_files(files_and_dirs):
                 process_small_file(file_path, log_file, corrections_file)
 
 def process_large_file(file_path, log_file, corrections_file):
+    """
+    Process a large file by chunking, summarizing, and verifying each chunk.
+    
+    Parameters:
+        file_path (str): Path to the file.
+        log_file (file): Log file to write summaries and verifications.
+        corrections_file (file): File to log corrections needed.
+    """
     chunk_number = 1
     for chunk in chunk_file(file_path):
         chunk_path = os.path.join(output_dir, f"{os.path.basename(file_path)}.chunk{chunk_number}")
@@ -102,6 +161,14 @@ def process_large_file(file_path, log_file, corrections_file):
         chunk_number += 1
 
 def process_small_file(file_path, log_file, corrections_file):
+    """
+    Process a small file by summarizing and verifying it.
+    
+    Parameters:
+        file_path (str): Path to the file.
+        log_file (file): Log file to write summaries and verifications.
+        corrections_file (file): File to log corrections needed.
+    """
     with open(file_path, 'r') as f:
         content = f.read()
         summary = summarize_code(content)
@@ -111,10 +178,28 @@ def process_small_file(file_path, log_file, corrections_file):
             corrections_file.write(f"{file_path} needs correction.\n")
 
 def extract_imports(file_content):
+    """
+    Extract import statements from the given file content.
+    
+    Parameters:
+        file_content (str): The content of the code file.
+
+    Returns:
+        set: A set of imported modules or packages.
+    """
     imports = re.findall(r'^\s*import\s+(\S+)|^\s*from\s+(\S+)', file_content, re.MULTILINE)
     return set(imp[0] or imp[1] for imp in imports)
 
 def analyze_dependencies(root_directory):
+    """
+    Analyze dependencies for all Python files in the root_directory.
+    
+    Parameters:
+        root_directory (str): The root directory to analyze for dependencies.
+
+    Returns:
+        set: A set of all imported modules or packages.
+    """
     files_and_dirs = list_files_and_directories(root_directory)
     dependencies = set()
 
@@ -129,12 +214,26 @@ def analyze_dependencies(root_directory):
     return dependencies
 
 def update_requirements(dependencies, requirements_file="requirements.txt"):
+    """
+    Update the requirements.txt file with the given dependencies.
+    
+    Parameters:
+        dependencies (set): The set of dependencies to write to the file.
+        requirements_file (str): The name of the requirements file.
+    """
     output_path = os.path.join(output_dir, requirements_file)
     with open(output_path, 'w') as f:
         for dependency in dependencies:
             f.write(f"{dependency}\n")
 
 def verify_dependencies(requirements_file="requirements.txt"):
+    """
+    Verify if the dependencies listed in the requirements file are installed.
+    Installs any missing dependencies.
+    
+    Parameters:
+        requirements_file (str): The name of the requirements file to verify.
+    """
     requirements_path = os.path.join(output_dir, requirements_file)
     with open(requirements_path, 'r') as f:
         dependencies = f.readlines()
@@ -149,6 +248,12 @@ def verify_dependencies(requirements_file="requirements.txt"):
             subprocess.check_call([sys.executable, '-m', 'pip', 'install', dependency])
 
 def update_status_and_logs(root_directory):
+    """
+    Update the status and logs for all files in the root_directory.
+    
+    Parameters:
+        root_directory (str): The root directory to update status and logs for.
+    """
     files_and_dirs = list_files_and_directories(root_directory)
     status_file_path = os.path.join(output_dir, "current_status.txt")
     test_file_path = os.path.join(output_dir, "test.txt")
@@ -163,6 +268,12 @@ def update_status_and_logs(root_directory):
                 test_file.write(f"Test: {file_path}\nResult: {'Pass' if 'Verified' in verification else 'Fail'}\n\n")
 
 def compare_with_scope(scope_file="project_scope.txt"):
+    """
+    Compare current project status with the project scope.
+    
+    Parameters:
+        scope_file (str): The name of the project scope file.
+    """
     scope_path = os.path.join(output_dir, scope_file)
     with open(scope_path, 'r') as file:
         scope_content = file.read()
@@ -174,6 +285,12 @@ def compare_with_scope(scope_file="project_scope.txt"):
         # Add comparison logic here
 
 def create_corrections(corrections_file="corrections_list.txt"):
+    """
+    Create corrections based on the corrections list file.
+    
+    Parameters:
+        corrections_file (str): The name of the corrections list file.
+    """
     corrections_path = os.path.join(output_dir, corrections_file)
     with open(corrections_path, 'r') as file:
         corrections = file.readlines()
@@ -183,6 +300,9 @@ def create_corrections(corrections_file="corrections_list.txt"):
         pass
 
 def run_tests():
+    """
+    Run unit tests and capture the output.
+    """
     result = subprocess.run(['python', '-m', 'unittest', 'discover', 'tests'], capture_output=True, text=True)
     test_results_path = os.path.join(output_dir, "test_results.txt")
     with open(test_results_path, 'w') as file:
@@ -201,4 +321,6 @@ if __name__ == "__main__":
         update_status_and_logs(root_directory)
         compare_with_scope()
         create_corrections()
-        run_tests()
+        # Commenting out run_tests() since initial tests are run on startup
+        # run_tests()
+

@@ -31,6 +31,15 @@ def verify_code(file_content):
     )
     return response.choices[0].text.strip()
 
+def get_corrections(file_content):
+    response = openai.Completion.create(
+        model="gpt-4o-mini",
+        prompt=f"Provide corrections for the following code:\n\n{file_content}",
+        temperature=0.5,
+        max_tokens=150
+    )
+    return response.choices[0].text.strip()
+
 def list_files_and_directories(root_directory):
     files_and_dirs = {
         "files": [],
@@ -63,34 +72,43 @@ def save_file_list(root_directory, output_file="file_list.txt"):
 
     print(f"File list saved to {output_path}")
 
-    # Open each file, summarize, verify and log results
+    process_files(files_and_dirs)
+
+def process_files(files_and_dirs):
     log_file_path = os.path.join(test_output_dir, "GPTlog.txt")
     corrections_file_path = os.path.join(test_output_dir, "corrections_list.txt")
-
     with open(log_file_path, 'w') as log_file, open(corrections_file_path, 'w') as corrections_file:
         corrections_file.write("Corrections:\n")
         for file in files_and_dirs["files"]:
             file_path = file["path"]
             if os.path.getsize(file_path) > 5000:
-                chunk_number = 1
-                for chunk in chunk_file(file_path):
-                    chunk_path = os.path.join(test_output_dir, f"{os.path.basename(file_path)}.chunk{chunk_number}")
-                    with open(chunk_path, 'w') as chunk_file:
-                        chunk_file.write(chunk)
-                    summary = summarize_code(chunk)
-                    verification = verify_code(chunk)
-                    log_file.write(f"File: {chunk_path}\nSummary:\n{summary}\n\nVerification:\n{verification}\n\n")
-                    if "Failed" in verification:
-                        corrections_file.write(f"{chunk_path} needs correction.\n")
-                    chunk_number += 1
+                process_large_file(file_path, log_file, corrections_file)
             else:
-                with open(file_path, 'r') as f:
-                    content = f.read()
-                    summary = summarize_code(content)
-                    verification = verify_code(content)
-                    log_file.write(f"File: {file_path}\nSummary:\n{summary}\n\nVerification:\n{verification}\n\n")
-                    if "Failed" in verification:
-                        corrections_file.write(f"{file_path} needs correction.\n")
+                process_small_file(file_path, log_file, corrections_file)
+
+def process_large_file(file_path, log_file, corrections_file):
+    chunk_number = 1
+    for chunk in chunk_file(file_path):
+        chunk_path = os.path.join(test_output_dir, f"{os.path.basename(file_path)}.chunk{chunk_number}")
+        with open(chunk_path, 'w') as chunk_file:
+            chunk_file.write(chunk)
+        summary = summarize_code(chunk)
+        verification = verify_code(chunk)
+        corrections = get_corrections(chunk)
+        log_file.write(f"File: {chunk_path}\nSummary:\n{summary}\n\nVerification:\n{verification}\n\n")
+        if "Failed" in verification:
+            corrections_file.write(f"{chunk_path} needs correction:\n{corrections}\n")
+        chunk_number += 1
+
+def process_small_file(file_path, log_file, corrections_file):
+    with open(file_path, 'r') as f:
+        content = f.read()
+        summary = summarize_code(content)
+        verification = verify_code(content)
+        corrections = get_corrections(content)
+        log_file.write(f"File: {file_path}\nSummary:\n{summary}\n\nVerification:\n{verification}\n\n")
+        if "Failed" in verification:
+            corrections_file.write(f"{file_path} needs correction:\n{corrections}\n")
 
 def extract_imports(file_content):
     imports = re.findall(r'^\s*import\s+(\S+)|^\s*from\s+(\S+)', file_content, re.MULTILINE)
@@ -238,3 +256,4 @@ class TestIterativeImprovement(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

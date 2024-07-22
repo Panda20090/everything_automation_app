@@ -12,6 +12,16 @@ output_dir = os.path.join(os.path.dirname(__file__), '../output_files')
 os.makedirs(output_dir, exist_ok=True)
 
 def list_files_and_directories(root_directory):
+    """
+    List all files and directories within the root_directory.
+    Returns a dictionary with files and directories.
+
+    Parameters:
+        root_directory (str): The root directory to search for files and directories.
+
+    Returns:
+        dict: A dictionary containing lists of files and directories.
+    """
     files_and_dirs = {
         "files": [],
         "directories": []
@@ -29,10 +39,30 @@ def list_files_and_directories(root_directory):
     return files_and_dirs
 
 def extract_imports(file_content):
+    """
+    Extract import statements from the given file content.
+    Returns a set of imported modules.
+
+    Parameters:
+        file_content (str): The content of the code file.
+
+    Returns:
+        set: A set of imported modules or packages.
+    """
     imports = re.findall(r'^\s*import\s+(\S+)|^\s*from\s+(\S+)', file_content, re.MULTILINE)
     return set(imp[0] or imp[1] for imp in imports)
 
 def analyze_dependencies(root_directory):
+    """
+    Analyze dependencies for all Python files in the root_directory.
+    Returns a set of all imported modules.
+
+    Parameters:
+        root_directory (str): The root directory to analyze for dependencies.
+
+    Returns:
+        set: A set of all imported modules or packages.
+    """
     files_and_dirs = list_files_and_directories(root_directory)
     dependencies = set()
 
@@ -47,12 +77,26 @@ def analyze_dependencies(root_directory):
     return dependencies
 
 def update_requirements(dependencies, requirements_file="requirements.txt"):
+    """
+    Update the requirements.txt file with the given dependencies.
+
+    Parameters:
+        dependencies (set): The set of dependencies to write to the file.
+        requirements_file (str): The name of the requirements file.
+    """
     output_path = os.path.join(output_dir, requirements_file)
     with open(output_path, 'w') as f:
         for dependency in dependencies:
             f.write(f"{dependency}\n")
 
 def verify_dependencies(requirements_file="requirements.txt"):
+    """
+    Verify if the dependencies listed in the requirements file are installed.
+    Installs any missing dependencies.
+
+    Parameters:
+        requirements_file (str): The name of the requirements file to verify.
+    """
     requirements_path = os.path.join(output_dir, requirements_file)
     with open(requirements_path, 'r') as f:
         dependencies = f.readlines()
