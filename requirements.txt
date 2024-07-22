@@ -8,7 +8,7 @@ werkzeug==3.0.3
 openai==0.10.2
 
 # Transformers for working with models
-transformers==4.37.0  # Downgraded to match tokenizers
+transformers==4.38.0  # Downgraded to match tokenizers
 
 # PyTorch for model training and inference
 torch==1.13.1
