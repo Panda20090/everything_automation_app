@@ -64,7 +64,7 @@ dash-html-components==2.0.0
 dash-table==5.0.0
 
 # For API Key Management and Security
-cryptography==3.4.8
+cryptography==42.0.4
 
 # Other required packages
 tweepy==4.14.0
