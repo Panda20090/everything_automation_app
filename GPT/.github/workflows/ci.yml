@@ -1,0 +1,79 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+
+    - name: Set environment variable
+      run: echo "PROJECT_ROOT=$(pwd)" >> $GITHUB_ENV
+
+    - name: Ensure venv is removed (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        if [ -d "GPT/setup/venv" ]; then
+          rm -rf GPT/setup/venv
+        fi
+      shell: bash
+
+    - name: Ensure venv is removed (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        if exist "GPT\setup\venv" rd /s /q "GPT\setup\venv"
+      shell: cmd
+
+    - name: Setup environment and install dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        bash GPT/setup/setup_env.sh
+      shell: bash
+
+    - name: Setup environment and install dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        powershell GPT/setup/setup_env.ps1
+      shell: powershell
+
+    - name: Run integration setup and tests (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      env:
+        TEST_MODE: 'true'
+      run: |
+        source GPT/setup/venv/bin/activate
+        python GPT/setup/run_integration_setup.py
+      shell: bash
+
+    - name: Run integration setup and tests (Windows)
+      if: matrix.os == 'windows-latest'
+      env:
+        TEST_MODE: 'true'
+      run: |
+        call GPT\setup\venv\Scripts\activate.bat
+        python GPT\setup\run_integration_setup.py
+      shell: cmd
+
+    - name: Cleanup (Ubuntu)
+      if: always() && matrix.os == 'ubuntu-latest'
+      run: |
+        rm -rf GPT/setup/venv
+      shell: bash
+
+    - name: Cleanup (Windows)
+      if: always() && matrix.os == 'windows-latest'
+      run: |
+        if exist "GPT\setup\venv" rd /s /q "GPT\setup\venv"
+      shell: cmd
