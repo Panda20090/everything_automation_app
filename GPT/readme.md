@@ -174,9 +174,6 @@ The `models` directory is designed to house various models for training and inte
 
 To add a new model, simply place the model files in the `other_models` directory and update the integration to utilize the new model as needed.
 
-
-
-
 ## Contributing
 
 Contributions are welcome! Please open an issue or submit a pull request for any changes or improvements.
@@ -188,4 +185,3 @@ This project is licensed under the MIT License.
 ## Acknowledgements
 
 Special thanks to the OpenAI team for providing the models and API that make this project possible.
-

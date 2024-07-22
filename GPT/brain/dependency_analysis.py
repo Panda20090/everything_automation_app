@@ -7,9 +7,12 @@ import logging
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Ensure the output directory exists
-output_dir = os.path.join(os.path.dirname(__file__), '../output_files')
+# Ensure the output directories exists
+output_dir = os.path.join(os.path.dirname(__file__), '../iteration/output_files')
 os.makedirs(output_dir, exist_ok=True)
+training_data_dir = os.path.join(os.path.dirname(__file__), '../models/Veronica/training_data')
+os.makedirs(training_data_dir, exist_ok=True)
+
 
 def list_files_and_directories(root_directory):
     """

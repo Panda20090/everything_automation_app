@@ -176,6 +176,15 @@ def process_files(files_and_dirs):
                 process_small_file(file_path, log_file, corrections_file)
 
 def batch_summarize(files):
+    """
+    Summarize a batch of files using OpenAI API.
+
+    Parameters:
+        files (list): List of file contents to summarize.
+
+    Returns:
+        list: List of summaries.
+    """
     try:
         batch_requests = [
             {
@@ -192,6 +201,15 @@ def batch_summarize(files):
         return []
 
 def batch_verify(files):
+    """
+    Verify a batch of files using OpenAI API.
+
+    Parameters:
+        files (list): List of file contents to verify.
+
+    Returns:
+        list: List of verification results.
+    """
     try:
         batch_requests = [
             {

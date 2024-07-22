@@ -25,6 +25,20 @@ def collect_data(log_directory, output_file):
     print(f"Data collected and saved to {output_file}")
 
 if __name__ == "__main__":
-    log_directory = "../output_files"
-    output_file = "training_data.json"
+    # Define the directories for output and training data
+    iteration_output_dir = "../GPT/iteration/output_files"
+    veronica_training_data_dir = "../models/Veronica/training_data"
+
+    # Ensure directories exist
+    os.makedirs(iteration_output_dir, exist_ok=True)
+    os.makedirs(veronica_training_data_dir, exist_ok=True)
+
+    # Collect data for iteration output
+    log_directory = iteration_output_dir
+    output_file = os.path.join(iteration_output_dir, "training_data.json")
+    collect_data(log_directory, output_file)
+
+    # Collect data for Veronica's training
+    log_directory = iteration_output_dir
+    output_file = os.path.join(veronica_training_data_dir, "training_data.json")
     collect_data(log_directory, output_file)
