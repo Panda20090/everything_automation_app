@@ -3,6 +3,7 @@ import subprocess
 import sys
 import platform
 from tkinter import Tk, Text, Scrollbar, Button, Label, END
+from dashboard import create_dashboard
 
 def set_project_root():
     project_root = os.getenv('PROJECT_ROOT')
@@ -76,7 +77,7 @@ def prompt_user_deployment_verification():
     def on_yes():
         print("User verified the deployment.")
         root.destroy()
-        deploy_integration()
+        create_dashboard()  # Open the dashboard after verification
 
     def on_cancel():
         print("User canceled the procedure.")
@@ -93,34 +94,6 @@ def prompt_user_deployment_verification():
     cancel_button.pack(side="right", padx=20, pady=20)
 
     root.mainloop()
-
-def deploy_integration():
-    project_root = os.getenv('PROJECT_ROOT')
-    gpt_directory = os.path.join(project_root, 'GPT')
-
-    # Cleanup the test virtual environment
-    if platform.system() == 'Windows':
-        venv_path = os.path.join(gpt_directory, 'setup', 'venv')
-        if os.path.exists(venv_path):
-            subprocess.run(f'rd /s /q "{venv_path}"', shell=True)
-    else:
-        venv_path = os.path.join(gpt_directory, 'setup', 'venv')
-        if os.path.exists(venv_path):
-            subprocess.run(['rm', '-rf', venv_path], shell=False)
-
-    # Set up a new virtual environment in the main project directory
-    if platform.system() == 'Windows':
-        setup_command = f'python -m venv {os.path.join(project_root, "venv")}'
-        subprocess.run(setup_command, shell=True)
-        activate_command = f'call {os.path.join(project_root, "venv", "Scripts", "activate.bat")}'
-        subprocess.run(activate_command + ' && pip install -r requirements.txt', shell=True)
-    else:
-        setup_command = f'python -m venv {os.path.join(project_root, "venv")}'
-        subprocess.run(setup_command, shell=False)
-        activate_command = f'source {os.path.join(project_root, "venv", "bin", "activate")}'
-        subprocess.run(activate_command + ' && pip install -r requirements.txt', shell=True)
-
-    print("Deployment complete. The integration is now running in the main project directory.")
 
 if __name__ == "__main__":
     set_project_root()
