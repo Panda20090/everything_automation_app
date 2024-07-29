@@ -18,7 +18,7 @@ tokenizers==0.13.3  # Upgraded to be compatible with transformers
 
 # Utility libraries
 requests==2.32.2
-tqdm==4.66.3
+tqdm==4.66.4
 
 # JSON handling
 simplejson==3.17.6
