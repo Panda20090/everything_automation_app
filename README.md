@@ -15,6 +15,6 @@ A desktop application for automating data tasks with visualization.
 Clone the repository and install the necessary dependencies:
 
 ```bash
-git clone https://github.com/yourusername/data_automation_app.git
+git clone https://github.com/Panda20090/everything_automation_app.git
 cd data_automation_app
 pip install -r requirements.txt
